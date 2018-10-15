@@ -25,8 +25,8 @@ git clone https://github.com/rancher/os.git
 cd os
 VMWARE_AUTOFORMAT=0 make vmware
 ```
-ISO生成到以下目录，这两个ISO其实是一个，可以通过`md5sum`验证。
-这个ISO和release里的ISO的区别是就是生成的IOS没有持久化目录，支持 boot for iso, 而release里的 rancherros-vmware.iso是持久化的，所以无法安装到磁盘
+ISO生成到以下目录，这两个ISO其实是一个，可以通过`md5sum`验证。  
+这个ISO和release里的ISO的区别是就是生成的IOS没有持久化目录，支持 boot form iso, 而release里的 rancherros-vmware.iso是持久化的，所以无法安装到磁盘
 ```
 ./dist/vmware/artifacts/rancheros.iso
 ./dist/artifacts/rancheros-vmware.iso
@@ -34,6 +34,7 @@ ISO生成到以下目录，这两个ISO其实是一个，可以通过`md5sum`验
 
 ## Build respherry pi iso
 > respherry pi 只能在ARM机器上build
+
 ```
 KERNEL_CHECK=0 make
 make rpi64
