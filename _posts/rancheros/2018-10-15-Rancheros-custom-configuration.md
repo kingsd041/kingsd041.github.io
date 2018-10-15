@@ -3,7 +3,7 @@ layout:     post
 title:      RancherOS自定义配置
 subtitle:   记录一些常用的配置
 date:       2018-10-15
-author:     BY
+author:     Ksd
 header-img: img/post-bg-unix-linux.jpg
 catalog: 	 true
 tags:
