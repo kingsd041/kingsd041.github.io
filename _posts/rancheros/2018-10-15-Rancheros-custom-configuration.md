@@ -25,6 +25,10 @@ Virtualbox下使用IPXE启动
 ```
 sudo ros config set rancher.debug true
 ```
+```
+rancher:
+  debug: true
+```
 
 ## Mirror
 ```
