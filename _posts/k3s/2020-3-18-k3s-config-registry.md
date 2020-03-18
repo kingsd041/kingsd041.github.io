@@ -1,7 +1,7 @@
 ---
 layout:     post
-title:      K3s常用配置
-subtitle:   K3s常用配置
+title:      K3s配置私有registry
+subtitle:   使用只签名证书
 date:       2020-3-18 21:06:00 +0800
 author:     Ksd
 header-img: img/post-bg-rancher-k8s.png
