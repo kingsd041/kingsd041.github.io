@@ -331,9 +331,9 @@ Unable to connect to the server: x509: certificate has expired or is not yet val
 
 原因应该和上一章节`证书已过期，k3s轮转证书`的原因一样，所以解决方法也基本相同。
 
-### 解决方法
+### 解决方法   
 
-1. 设置系统时间（小于证书轮转前的证书过期时间），确保可以从新通过kubctl操作集群
+1. 设置系统时间（小于证书轮转前的证书过期时间），确保可以从新通过kubctl操作集群   
 
 ```
 date -s 20210720
@@ -343,9 +343,9 @@ NAME               STATUS   ROLES    AGE    VERSION
 ip-172-31-19-157   Ready    master   358d   v1.18.6+k3s1
 ```
 
-2. 删除k3s-serving
+2. 删除k3s-serving   
 
-> 必须得同时删除k3s-serving和dynamic-cert.json，否则重启K3s之后，k3s-serving的过期时间也不会更新，原因不详。
+> 必须得同时删除k3s-serving和dynamic-cert.json，否则重启K3s之后，k3s-serving的过期时间也不会更新，原因不详。   
 
 ```
 kubectl delete secret k3s-serving -n kube-system
@@ -356,13 +356,13 @@ secret "k3s-serving" deleted
 rm -rf /var/lib/rancher/k3s/server/tls/dynamic-cert.json
 ```
 
-3. 修改时间为已过期的时间，然后重启k3s触发更新并且从新创建k3s-serveing
+3. 修改时间为已过期的时间，然后重启k3s触发更新并且从新创建k3s-serveing   
 
 ```
 date -s 20210920
 service k3s restart
 ```
-4. 确认证书已更新
+4. 确认证书已更新   
 
 ```
 date
