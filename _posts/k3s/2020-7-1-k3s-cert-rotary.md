@@ -85,13 +85,11 @@ notAfter=Jul 26 04:53:44 2021 GMT
 可以确认 k3s集群的过期时间为`Jul 26 04:53:44 2021 GMT`
 
 5. 修改系统时间，修改为大于证书过期的时间。比如上步查询的证书过期时间为`2021-7-26`，修改后的日志应该大于这个时间，例如修改为`2021-08-24`来模拟证书已经过期的场景。
-
 ```
 # date -s 20210920
 ```
 
 6. 确认证书已经过期的情况下无法操作k3s集群
-
 ```
 # kubectl get nodes
 Unable to connect to the server: x509: certificate has expired or is not yet valid
@@ -161,9 +159,9 @@ Aug 24 00:03:10 ip-172-31-19-157 k3s[8854]: time="2021-08-24T00:03:10.140052506Z
 
 1. 设置系统时间（小于证书轮转前的证书过期时间），确保可以重新通过kubctl操作集群
 ```
-# date -s 20210720
+date -s 20210720
 
-# kubectl get nodes
+kubectl get nodes
 NAME               STATUS   ROLES    AGE    VERSION
 ip-172-31-19-157   Ready    master   358d   v1.18.6+k3s1
 ```
@@ -173,26 +171,26 @@ ip-172-31-19-157   Ready    master   358d   v1.18.6+k3s1
 > 必须得同时删除k3s-serving和dynamic-cert.json，否则重启K3s之后，k3s-serving的过期时间也不会更新，原因不详。
 
 ```
-# kubectl delete secret k3s-serving -n kube-system
+kubectl delete secret k3s-serving -n kube-system
 secret "k3s-serving" deleted
 ```
 
 ```
-# rm -rf /var/lib/rancher/k3s/server/tls/dynamic-cert.json
+rm -rf /var/lib/rancher/k3s/server/tls/dynamic-cert.json
 ```
 
 3. 修改时间为已过期的时间，然后重启k3s触发更新并且从新创建k3s-serveing
 
 ```
-# date -s 20210920
-# service k3s restart
+date -s 20210920
+service k3s restart
 ```
 4. 确认证书已更新
 ```
-# date
+date
 Mon Sep 20 00:02:29 UTC 2021
 
-# kubectl get node
+kubectl get node
 NAME               STATUS   ROLES    AGE    VERSION
 ip-172-31-19-157   Ready    master   420d   v1.18.6+k3s1
 ```
@@ -201,13 +199,13 @@ ip-172-31-19-157   Ready    master   420d   v1.18.6+k3s1
 
 1. 查下当前时间
 ```
-# date
+date
 Fri Jul 24 07:00:22 UTC 2020
 ```
 
 2. 关闭ubuntu 时钟同步
 ```
-# timedatectl set-ntp no
+timedatectl set-ntp no
 ```
 
 3. 启动k3s 集群
@@ -217,7 +215,7 @@ curl -sfL https://get.k3s.io | sh -
 
 4. 查看证书过期时间
 ```
-# for i in `ls /var/lib/rancher/k3s/server/tls/*.crt`; do echo $i; openssl x509 -enddate -noout -in $i; done
+for i in `ls /var/lib/rancher/k3s/server/tls/*.crt`; do echo $i; openssl x509 -enddate -noout -in $i; done
 /var/lib/rancher/k3s/server/tls/client-admin.crt
 notAfter=Jul 24 07:04:04 2021 GMT
 /var/lib/rancher/k3s/server/tls/client-auth-proxy.crt
@@ -249,26 +247,26 @@ notAfter=Jul 24 07:04:04 2021 GMT
 
 修改为`Jul 20 2021 GMT`
 ```
-# date -s 20210720
+date -s 20210720
 ```
 > 修改的时间应该为证书过期前 90天之内的时间
 
 6. 确认证书未过期的情况下依然可以操作k3s集群
 
 ```
-# kubectl get nodes
+kubectl get nodes
 NAME               STATUS   ROLES    AGE    VERSION
 ip-172-31-30-162   Ready    master   360d   v1.18.6+k3s1
 ```
 
 7. 重启K3s，触发轮转证书机制
 ```
-# service k3s restart
+service k3s restart
 ```
 
 8. 查看证书过期时间
 ```
-# for i in `ls /var/lib/rancher/k3s/server/tls/*.crt`; do echo $i; openssl x509 -enddate -noout -in $i; done
+for i in `ls /var/lib/rancher/k3s/server/tls/*.crt`; do echo $i; openssl x509 -enddate -noout -in $i; done
 /var/lib/rancher/k3s/server/tls/client-admin.crt
 notAfter=Jul 20 00:01:12 2022 GMT
 /var/lib/rancher/k3s/server/tls/client-auth-proxy.crt
@@ -325,7 +323,7 @@ date -s 20210920
 
 2. 再次确认K3S集群可用，报错：
 ```
-# kubectl get nodes
+kubectl get nodes
 Unable to connect to the server: x509: certificate has expired or is not yet valid
 ```
 
@@ -337,9 +335,9 @@ Unable to connect to the server: x509: certificate has expired or is not yet val
 
 1. 设置系统时间（小于证书轮转前的证书过期时间），确保可以从新通过kubctl操作集群
 ```
-# date -s 20210720
+date -s 20210720
 
-# kubectl get nodes
+kubectl get nodes
 NAME               STATUS   ROLES    AGE    VERSION
 ip-172-31-19-157   Ready    master   358d   v1.18.6+k3s1
 ```
@@ -349,7 +347,7 @@ ip-172-31-19-157   Ready    master   358d   v1.18.6+k3s1
 > 必须得同时删除k3s-serving和dynamic-cert.json，否则重启K3s之后，k3s-serving的过期时间也不会更新，原因不详。
 
 ```
-# kubectl delete secret k3s-serving -n kube-system
+kubectl delete secret k3s-serving -n kube-system
 secret "k3s-serving" deleted
 ```
 
@@ -359,15 +357,15 @@ rm -rf /var/lib/rancher/k3s/server/tls/dynamic-cert.json
 3. 修改时间为已过期的时间，然后重启k3s触发更新并且从新创建k3s-serveing
 
 ```
-# date -s 20210920
-# service k3s restart
+date -s 20210920
+service k3s restart
 ```
 4. 确认证书已更新
 ```
-# date
+date
 Mon Sep 20 00:02:29 UTC 2021
 
-# kubectl get node
+kubectl get node
 NAME               STATUS   ROLES    AGE    VERSION
 ip-172-31-19-157   Ready    master   420d   v1.18.6+k3s1
 ```
