@@ -66,9 +66,9 @@ curl -s -H "Authorization: Bearer ${TOKEN}" "${RANCHERURL}/v3/clusterregistratio
 curl -s -k -H "Authorization: Bearer ${TOKEN}" "${RANCHERURL}/v3/clusterregistrationtokens?clusterId=${CLUSTERID}" | jq -r '.data[] | select(.name != "system") | .insecureCommand'
 ```
 以上命令执行成功后，将返回导入集群的命令，请做好备份，命令如下：
+
 ```
 curl --insecure -sfL https://192.168.99.201/v3/import/2mgnx6f4tvgk5skfzgs6qlcrvn5nnwqh9kchqbf5lhlnswfcfrqwpr.yaml | kubectl apply -f -
-
 ```
 
 
