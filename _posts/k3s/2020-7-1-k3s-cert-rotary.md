@@ -334,6 +334,7 @@ Unable to connect to the server: x509: certificate has expired or is not yet val
 ### 解决方法
 
 1. 设置系统时间（小于证书轮转前的证书过期时间），确保可以从新通过kubctl操作集群
+
 ```
 date -s 20210720
 
@@ -354,6 +355,7 @@ secret "k3s-serving" deleted
 ```
 rm -rf /var/lib/rancher/k3s/server/tls/dynamic-cert.json
 ```
+
 3. 修改时间为已过期的时间，然后重启k3s触发更新并且从新创建k3s-serveing
 
 ```
@@ -361,6 +363,7 @@ date -s 20210920
 service k3s restart
 ```
 4. 确认证书已更新
+
 ```
 date
 Mon Sep 20 00:02:29 UTC 2021
