@@ -129,7 +129,6 @@ notAfter=Jul 24 04:53:44 2030 GMT
 notAfter=Aug 24 00:00:13 2022 GMT
 ```
 从上面的结果来看，证书过期时间已经更新为`Aug 24 00:00:13 2022 GMT`,但此时是无法通过kubectl来操作k3s集群的：
-
 ```
 # kubectl get ndoes
 Unable to connect to the server: x509: certificate has expired or is not yet valid
