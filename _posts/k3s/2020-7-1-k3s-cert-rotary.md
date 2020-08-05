@@ -187,6 +187,7 @@ date -s 20210920
 service k3s restart
 ```
 4. 确认证书已更新
+
 ```
 date
 Mon Sep 20 00:02:29 UTC 2021
