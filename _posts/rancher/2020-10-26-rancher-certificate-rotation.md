@@ -60,6 +60,7 @@ notAfter=Oct 19 06:31:26 2021 GMT
 ### 开始验证
 
 1. 将服务器时间调整为还有5天过期的时间，比如：`20211015`
+
 ```
 timedatectl set-ntp no
 
@@ -72,6 +73,7 @@ Fri Oct 15 00:00:02 CST 2021
 2. 触发证书更新
 
 rancher 会在没6小时检查一下证书，如果快过期了，会更新Rancher的相关证书，但本次测试为了快点更新，直接使用使用重启rancher的方式触发更新。
+
 ```
 docker restat rancher-server
 ```
@@ -104,11 +106,13 @@ docker restat rancher-server
     /var/lib/rancher/k3s/server/tls/serving-kube-apiserver.crt
     notAfter=Oct 19 07:45:23 2021 GMT
     ```
+    
     从上面的结果来看，K3s的证书并没有更新，这回导致到了K3s证书过期时间之后，Rancher server将反复重启，也就是开头遇见的那个问题。
     
 ### 问题解决
 
 1. exec 到Rancher server内，删除对应的证书：
+
 ```
 rm -rf /var/lib/rancher/k3s/server/tls/*.crt 
 ```
@@ -120,6 +124,7 @@ rm -rf /var/lib/rancher/k3s/server/tls/*.crt
 
 3. 检查K3s证书过期时间
     在容器内执行：
+    
     ```
     # for i in `ls /var/lib/rancher/k3s/server/tls/*.crt  `; do echo $i; openssl x509 -enddate -noout -in $i; done
     /var/lib/rancher/k3s/server/tls/client-admin.crt
@@ -147,6 +152,7 @@ rm -rf /var/lib/rancher/k3s/server/tls/*.crt
     从以上结果可以看到，K3s的证书过期时间已经更新成了 2022年 10月 14日
     
     此时将服务器时间再往后调整一个月，验证K3s和Rancher server是否正常
+    
     ```
     date -s 20211115
     ```
