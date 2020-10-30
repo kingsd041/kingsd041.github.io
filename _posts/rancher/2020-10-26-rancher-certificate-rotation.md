@@ -13,149 +13,171 @@ tags:
     - Certificate Rotation
 ---
 
-最近社区用户出现了rancher v2.3 证书过期导致 rancher server的容器无法启动的情况,
-日志：
-![](https://tva1.sinaimg.cn/large/007S8ZIlgy1gjunm8pym1j30t403amxq.jpg)
+## 前言
 
-按照官网的逻辑：
-> 证书未过期时，rancher server 可以正常运行。升级到 Rancher v2.0.14+ 、v2.1.9+、v2.2.2+ 后会自动检查证书有效期，如果发现证书即将过期，将会自动生成新的证书。所以独立容器运行的 Rancher Server，只需在证书过期前把 rancher 版本升级到支持自动更新 ssl 证书的版本即可，无需做其他操作。
+Rancher v2.3正式release已经一年的时间了，第一批使用Rancher v2.3的用户可能会遇到了Rancher Server证书过期，没有自动轮换的情况。
 
-理论上在过期之前,应该自动续签证书才对,所以带着疑问,在2.3进行了测试
+这会导致Rancher Server无法启动，并且日志会报错：
 
-**注意：操作轮转证书之前，一定要针对你的Rancher Server做好备份！！！参考[官网](https://docs.rancher.cn/docs/rancher2/backups/backups/_index)**
+![](https://tva1.sinaimg.cn/large/0081Kckwly1gk56rrww4oj31h60aw401.jpg)
 
-## 基于Rancher v2.3.1验证
+> **注意：**
 
-### 基础环境
+1. Rancher Server无法启动不会影响下游集群，下游集群依然可以通过kubeconfig去操作。
+2. 以上情况只会在`docker run`并且使用 Rancher 默认的自签名证书启动和使用小于k3s v1.19用作local集群的Rancher上才会发生。
 
-测试日期: `2020年10月19日 星期一 15时07分13秒 CST`
+## 重现问题
 
-启动Rancher 之后，从浏览器上查看到的证书过期时间：`2021年10月19日 星期二 中国标准时间 14:31:44`
+为了让大家更好的理解这个问题，下面将以手动修改系统时间的形式来重现这个问题。
 
-exec 到 rancher server 容器，查看K3S 证书过期时间：
+当前时间：`2020年10月30日 星期五 10时37分59秒 CST`
+
+1. 启动Rancher v2.3.1，并且添加下游集群，操作步骤可以参考官网：
+
+    https://docs.rancher.cn/docs/rancher2/installation/other-installation-methods/single-node-docker/_index/
+
+    https://docs.rancher.cn/docs/rancher2/cluster-provisioning/_index
+
+2. 启动Rancher 之后，从浏览器上查看到的过期时间：`2021年10月30日 星期六 中国标准时间 10:29:35`
+
+    ![](https://tva1.sinaimg.cn/large/0081Kckwly1gk75sw66k2j30ri0goq46.jpg)
+
+3. 查看Rancher Server容器内的K3s证书过期时间为`Oct 28 08:34:23 2021 GMT`
+
 ```
-for i in `ls /var/lib/rancher/k3s/server/tls/*.crt`; do echo $i; openssl x509 -enddate -noout -in $i; done
+root@rancher1:~# docker exec -it rancher_server_id bash
+root@25c228f6a4c8:/var/lib/rancher# for i in `ls /var/lib/rancher/k3s/server/tls/*.crt`; do echo $i; openssl x509 -enddate -noout -in $i; done
 /var/lib/rancher/k3s/server/tls/client-admin.crt
-notAfter=Oct 19 06:31:26 2021 GMT
+notAfter=Oct 30 02:28:49 2021 GMT
 /var/lib/rancher/k3s/server/tls/client-auth-proxy.crt
-notAfter=Oct 19 06:31:26 2021 GMT
+notAfter=Oct 30 02:28:49 2021 GMT
 /var/lib/rancher/k3s/server/tls/client-ca.crt
-notAfter=Oct 17 06:31:26 2030 GMT
+notAfter=Oct 28 02:28:49 2030 GMT
 /var/lib/rancher/k3s/server/tls/client-controller.crt
-notAfter=Oct 19 06:31:26 2021 GMT
+notAfter=Oct 30 02:28:49 2021 GMT
 /var/lib/rancher/k3s/server/tls/client-kube-apiserver.crt
-notAfter=Oct 19 06:31:26 2021 GMT
+notAfter=Oct 30 02:28:49 2021 GMT
 /var/lib/rancher/k3s/server/tls/client-kube-proxy.crt
-notAfter=Oct 19 06:31:26 2021 GMT
+notAfter=Oct 30 02:28:49 2021 GMT
 /var/lib/rancher/k3s/server/tls/client-scheduler.crt
-notAfter=Oct 19 06:31:26 2021 GMT
+notAfter=Oct 30 02:28:49 2021 GMT
 /var/lib/rancher/k3s/server/tls/request-header-ca.crt
-notAfter=Oct 17 06:31:26 2030 GMT
+notAfter=Oct 28 02:28:49 2030 GMT
 /var/lib/rancher/k3s/server/tls/server-ca.crt
-notAfter=Oct 17 06:31:26 2030 GMT
+notAfter=Oct 28 02:28:49 2030 GMT
 /var/lib/rancher/k3s/server/tls/serving-kube-apiserver.crt
-notAfter=Oct 19 06:31:26 2021 GMT
+notAfter=Oct 30 02:28:49 2021 GMT
 ```
 
-### 开始验证
-
-1. 将服务器时间调整为还有5天过期的时间，比如：`20211015`
+4. 将服务器时间调整为证书过期后5天的日期，比如：`20211105`
 
 ```
-timedatectl set-ntp no
-
-date -s 20211015
-
-date
-Fri Oct 15 00:00:02 CST 2021
+root@rancher1:~# timedatectl set-ntp no
+root@rancher1:~# date -s 20211105
+Fri Nov  5 00:00:00 CST 2021
+root@rancher1:~# date
+Fri Nov  5 00:00:00 CST 2021
 ```
 
-2. 触发证书更新
+此时，Rancher UI 已经无法访问:
 
-rancher 会在没6小时检查一下证书，如果快过期了，会更新Rancher的相关证书，但本次测试为了快点更新，直接使用使用重启rancher的方式触发更新。
+![](https://tva1.sinaimg.cn/large/0081Kckwly1gk75zwz2lfj31680re74o.jpg)
 
-```
-docker restat rancher-server
-```
+并且Rancher 容器由于内置的K3s证书过期不停的重启，也就是在前言中提到的现象。
 
-3. 验证证书更新
 
-    - 在浏览器上查看证书的过期时间：`2022年10月15日 星期六 中国标准时间 00:04:53`，已经更新成功
-    - 检查K3S的证书：
-    
-    ```
-    # for i in `ls /var/lib/rancher/k3s/server/tls/*.crt`; do echo $i; openssl x509 -enddate -noout -in $i; done
-    /var/lib/rancher/k3s/server/tls/client-admin.crt
-    notAfter=Oct 19 07:45:23 2021 GMT
-    /var/lib/rancher/k3s/server/tls/client-auth-proxy.crt
-    notAfter=Oct 19 07:45:23 2021 GMT
-    /var/lib/rancher/k3s/server/tls/client-ca.crt
-    notAfter=Oct 17 07:45:23 2030 GMT
-    /var/lib/rancher/k3s/server/tls/client-controller.crt
-    notAfter=Oct 19 07:45:23 2021 GMT
-    /var/lib/rancher/k3s/server/tls/client-kube-apiserver.crt
-    notAfter=Oct 19 07:45:23 2021 GMT
-    /var/lib/rancher/k3s/server/tls/client-kube-proxy.crt
-    notAfter=Oct 19 07:45:23 2021 GMT
-    /var/lib/rancher/k3s/server/tls/client-scheduler.crt
-    notAfter=Oct 19 07:45:23 2021 GMT
-    /var/lib/rancher/k3s/server/tls/request-header-ca.crt
-    notAfter=Oct 17 07:45:23 2030 GMT
-    /var/lib/rancher/k3s/server/tls/server-ca.crt
-    notAfter=Oct 17 07:45:23 2030 GMT
-    /var/lib/rancher/k3s/server/tls/serving-kube-apiserver.crt
-    notAfter=Oct 19 07:45:23 2021 GMT
-    ```
-    
-    从上面的结果来看，K3s的证书并没有更新，这回导致到了K3s证书过期时间之后，Rancher server将反复重启，也就是开头遇见的那个问题。
-    
-### 问题解决
+## 手动轮换证书
 
-1. exec 到Rancher server内，删除对应的证书：
+以上的现象是因为Rancher Server内置的K3s证书过期，导致K3s无法启动，从而影响到了Rancher Server容器无法启动。
+
+为了可以继续操作Rancher Server容器，需要将系统时间调整到K3s证书过期之前。
 
 ```
-rm -rf /var/lib/rancher/k3s/server/tls/*.crt 
+root@rancher1:~# date -s 20211025
+Mon Oct 25 00:00:00 CST 2021
 ```
 
-2. 重启Rancher server容器
-    有时候会反复刷日志`2021/10/14 16:12:10 [INFO] Waiting for server to become available: Get https://localhost:6443/version?timeout=30s: x509: certificate signed by unknown authority`
+> 如果启动Rancher时未加`--restart=unless-stopped`参数，需要手动启动Rancher Server。
 
-    如果出现以上日志，那就再重启一次rancher server
+接下来我们就可以进入到容器内手动删除K3s证书，然后重启Rancher，重启成功后将重新生成K3s证书
 
-3. 检查K3s证书过期时间
-    在容器内执行：
-    
-    ```
-    # for i in `ls /var/lib/rancher/k3s/server/tls/*.crt  `; do echo $i; openssl x509 -enddate -noout -in $i; done
-    /var/lib/rancher/k3s/server/tls/client-admin.crt
-    notAfter=Oct 14 16:16:34 2022 GMT
-    /var/lib/rancher/k3s/server/tls/client-auth-proxy.crt
-    notAfter=Oct 14 16:16:34 2022 GMT
-    /var/lib/rancher/k3s/server/tls/client-ca.crt
-    notAfter=Oct 12 16:16:34 2031 GMT
-    /var/lib/rancher/k3s/server/tls/client-controller.crt
-    notAfter=Oct 14 16:16:34 2022 GMT
-    /var/lib/rancher/k3s/server/tls/client-kube-apiserver.crt
-    notAfter=Oct 14 16:16:34 2022 GMT
-    /var/lib/rancher/k3s/server/tls/client-kube-proxy.crt
-    notAfter=Oct 14 16:16:34 2022 GMT
-    /var/lib/rancher/k3s/server/tls/client-scheduler.crt
-    notAfter=Oct 14 16:16:34 2022 GMT
-    /var/lib/rancher/k3s/server/tls/request-header-ca.crt
-    notAfter=Oct 12 16:16:34 2031 GMT
-    /var/lib/rancher/k3s/server/tls/server-ca.crt
-    notAfter=Oct 12 16:16:34 2031 GMT
-    /var/lib/rancher/k3s/server/tls/serving-kube-apiserver.crt
-    notAfter=Oct 14 16:16:34 2022 GMT
-    ```
-    
-    从以上结果可以看到，K3s的证书过期时间已经更新成了 2022年 10月 14日
-    
-    此时将服务器时间再往后调整一个月，验证K3s和Rancher server是否正常
-    
-    ```
-    date -s 20211115
-    ```
-    
-    结果：
-    Rancher 访问正常
+```
+root@rancher1:~# docker exec -it rancher_server_id bash
+root@25c228f6a4c8:/var/lib/rancher# rm -rf /var/lib/rancher/k3s/server/tls/*.crt
+root@25c228f6a4c8:/var/lib/rancher# exit
+exit
+root@rancher1:~# docker restart rancher_server_id
+```
+
+Rancher Server如果出现以下日志，那就再重启一次Rancher Server：
+
+```
+2021/10/24 16:01:00 [INFO] Waiting for server to become available: Get https://localhost:6443/version?timeout=30s: x509: certificate signed by unknown authority
+```
+
+## 验证
+
+1. 将服务器时间再次调整为证书过期后5天的日期，比如：`20211105`
+
+```
+root@rancher1:~# date -s 20211105
+Fri Nov  5 00:00:00 CST 2021
+```
+
+证书更新之后，我们需要确认下K3s证书是否更新成功，还需要检查下游集群是否会有影响。
+
+2. 确认K3s证书已经更新
+
+```
+root@rancher1:~# docker exec -it rancher_server_id bash
+root@25c228f6a4c8:/var/lib/rancher# for i in `ls /var/lib/rancher/k3s/server/tls/*.crt`; do echo $i; openssl x509 -enddate -noout -in $i; done
+/var/lib/rancher/k3s/server/tls/client-admin.crt
+notAfter=Oct 24 16:00:54 2022 GMT
+/var/lib/rancher/k3s/server/tls/client-auth-proxy.crt
+notAfter=Oct 24 16:00:54 2022 GMT
+/var/lib/rancher/k3s/server/tls/client-ca.crt
+notAfter=Oct 22 16:00:54 2031 GMT
+/var/lib/rancher/k3s/server/tls/client-controller.crt
+notAfter=Oct 24 16:00:54 2022 GMT
+/var/lib/rancher/k3s/server/tls/client-kube-apiserver.crt
+notAfter=Oct 24 16:00:54 2022 GMT
+/var/lib/rancher/k3s/server/tls/client-kube-proxy.crt
+notAfter=Oct 24 16:00:54 2022 GMT
+/var/lib/rancher/k3s/server/tls/client-scheduler.crt
+notAfter=Oct 24 16:00:54 2022 GMT
+/var/lib/rancher/k3s/server/tls/request-header-ca.crt
+notAfter=Oct 22 16:00:54 2031 GMT
+/var/lib/rancher/k3s/server/tls/server-ca.crt
+notAfter=Oct 22 16:00:54 2031 GMT
+/var/lib/rancher/k3s/server/tls/serving-kube-apiserver.crt
+notAfter=Oct 24 16:00:54 2022 GMT
+```
+
+K3s证书过期时间已经从`Oct 30 02:28:49 2021 GMT`更新到了`Oct 24 16:00:54 2022 GMT`
+
+3. 确认浏览器证书已经更新
+
+浏览器上的证书过期已经从`2021年10月30日 星期六 中国标准时间 10:29:35`更新到了`2022年10月25日 星期二 中国标准时间 00:01:34`
+
+![](https://tva1.sinaimg.cn/large/0081Kckwly1gk767cso67j30re0gkt9v.jpg)
+
+4. 确认下游集群不受影响
+
+    - 集群状态为`Active`
+    ![](https://tva1.sinaimg.cn/large/0081Kckwly1gk565guljaj31zs0i0wey.jpg)
+
+    - 检查集群 Pod 的运行状况
+    ![](https://tva1.sinaimg.cn/large/0081Kckwly1gk567u2576j312w0gumye.jpg)
+
+## 后记
+
+Rancher从v2.3开始，在Rancher Server容器中内置了K3s作为local集群来支撑Rancher Server运行。
+
+而k3s内部自动签发的证书的有效期是1年，正常情况下如果证书已过期或剩余的时间少于90天，则在重新启动K3s时将轮换证书。参考官网：https://docs.rancher.cn/docs/k3s/advanced/_index
+
+但实际上由于K3s的bug导致在证书已过期或剩余的时间少于90天时重启Rancher没有将证书轮换，所以才会出现前言中的问题。
+
+不过不用担心，在后续的K3s v1.19版本中已经解决了这个问题，参考：https://github.com/rancher/k3s/commit/a2471a1f8a2aa26902f8e3b29624dc9c809024d2
+
+
+
