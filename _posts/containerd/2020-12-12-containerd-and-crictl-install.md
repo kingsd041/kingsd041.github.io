@@ -18,7 +18,7 @@ tags:
 
 ## 安装 Containerd
 
-### 下载安装文件
+#### 下载安装文件
 
 可以在[下载](https://containerd.io/downloads/)页面下载containerd中最新的版本，然后使用您喜欢的方式启动守护程序。
 
@@ -29,7 +29,7 @@ wget https://github.com/containerd/containerd/releases/download/v1.4.3/container
 tar xvf containerd-1.4.3-linux-amd64.tar.gz -C /usr/local
 ```
 
-### 生成配置文件
+#### 生成配置文件
 
 Containerd启动需要一个配置文件，当启动containerd之后会根据这个配置文件去启动，默认位置是：`用/etc/containerd/config.toml`。
 
@@ -56,7 +56,7 @@ Containerd启动需要一个配置文件，当启动containerd之后会根据这
 
 以上的配置需要注意`grpc.address`的配置，默认的配置为：`"/run/containerd/containerd.sock"`，一会安装`crictl`时候会用的到。
 
-### 准备containerd 启动文件
+#### 准备containerd 启动文件
 
 这个配置文件可以从[下载](https://containerd.io/downloads/)页面里的源码包获得
 
@@ -104,7 +104,7 @@ OOMScoreAdjust=-999
 WantedBy=multi-user.target
 ```
 
-### 启动containerd
+#### 启动containerd
 
 ```
 systemctl daemon-reload
@@ -122,7 +122,7 @@ Containerd中默认带有`ctr`命令工具，它是一个简单的 CLI 接口，
 
 `crictl`是一个命令行接口，用于与CRI兼容的容器运行时。你可以使用它来检查和调试Kubernetes节点上的容器运行时和应用程序。crictl及其源代码托管在[cri-tools](https://github.com/kubernetes-sigs/cri-tools/blob/master/docs/crictl.md)仓库中。
 
-### 开始安装
+#### 开始安装
 
 可以从[cri-tools发布页面](https://github.com/kubernetes-sigs/cri-tools/releases)下载crictl：
 
@@ -133,7 +133,7 @@ sudo tar zxvf crictl-$VERSION-linux-amd64.tar.gz -C /usr/local/bin
 rm -f crictl-$VERSION-linux-amd64.tar.gz
 ```
 
-### 配置 crictl
+#### 配置 crictl
 
 crictl默认连接到 `unix:///var/run/dockershim.sock`。对于其它运行时，你可以通过多种方式设置端点:
 
