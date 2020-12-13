@@ -37,21 +37,21 @@ Containerd启动需要一个配置文件，当启动containerd之后会根据这
 
 1. 参考[containerd官网](https://containerd.io/docs/getting-started/)的示例，手动创建。例如：
 
-```
-subreaper = true
-oom_score = -999
-
-[debug]
-        level = "debug"
-
-[metrics]
-        address = "127.0.0.1:1338"
-
-[plugins.linux]
-        runtime = "runc"
-        shim_debug = true
-```
-
+    ```
+    subreaper = true
+    oom_score = -999
+    
+    [debug]
+            level = "debug"
+    
+    [metrics]
+            address = "127.0.0.1:1338"
+    
+    [plugins.linux]
+            runtime = "runc"
+            shim_debug = true
+    ```
+    
 2. 通过`containerd config default > /etc/containerd/config.toml`创建，配置文件说明参考：https://github.com/containerd/containerd/blob/master/docs/man/containerd-config.toml.5.md
 
 以上的配置需要注意`grpc.address`的配置，默认的配置为：`"/run/containerd/containerd.sock"`，一会安装`crictl`时候会用的到。
