@@ -2,7 +2,7 @@
 layout:     post
 title:      业务集群无法连接 Rancher 自定义域名
 subtitle:   ERROR: https://rancher.my.org/ping is not accessible (Could not resolve host: rancher.my.org)
-date:       2020-10-26 15:06:00 +0800
+date:       2020-12-17 15:06:00 +0800
 author:     Ksd
 header-img: img/rancher.jpeg
 catalog: true
@@ -10,7 +10,7 @@ tags:
     - rancher
     - rancher-server
     - rancher cluster
-    - Certificate Rotation
+    - cluster-agent
 ---
 
 ## 问题描述
