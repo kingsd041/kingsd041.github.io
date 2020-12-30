@@ -37,30 +37,30 @@ containerd 使用了类似 K8S 中 svc 与 endpoint 的概念，svc 可以理解
 
 比如以下配置示例：
 
-   ```yaml
-   mirrors:
-   "172.31.6.200:5000":
-      endpoint:
-         - "http://172.31.6.200:5000"
-   "rancher.ksd.top:5000":
-      endpoint:
-         - "http://172.31.6.200:5000"
-   "docker.io":
-      endpoint:
-         - "https://fogjl973.mirror.aliyuncs.com"
-         - "https://registry-1.docker.io"
-   ```
+```yaml
+mirrors:
+  "172.31.6.200:5000":
+    endpoint:
+      - "http://172.31.6.200:5000"
+  "rancher.ksd.top:5000":
+    endpoint:
+      - "http://172.31.6.200:5000"
+  "docker.io":
+    endpoint:
+      - "https://fogjl973.mirror.aliyuncs.com"
+      - "https://registry-1.docker.io"
+```
 
 可以通过 `crictl pull 172.31.6.200:5000/library/alpine` 和 `crictl pull rancher.ksd.top:5000/library/alpine`获取到镜像，但镜像都是从同一个仓库获取到的。
 
-   ```bash
-   root@rancher-server:/etc/rancher/k3s# systemctl restart k3s.service
-   root@rancher-server:/etc/rancher/k3s# crictl pull 172.31.6.200:5000/library/alpine
-   Image is up to date for sha256:a24bb4013296f61e89ba57005a7b3e52274d8edd3ae2077d04395f806b63d83e
-   root@rancher-server:/etc/rancher/k3s# crictl pull rancher.ksd.top:5000/library/alpine
-   Image is up to date for sha256:a24bb4013296f61e89ba57005a7b3e52274d8edd3ae2077d04395f806b63d83e
-   root@rancher-server:/etc/rancher/k3s#
-   ```
+```bash
+root@rancher-server:/etc/rancher/k3s# systemctl restart k3s.service
+root@rancher-server:/etc/rancher/k3s# crictl pull 172.31.6.200:5000/library/alpine
+Image is up to date for sha256:a24bb4013296f61e89ba57005a7b3e52274d8edd3ae2077d04395f806b63d83e
+root@rancher-server:/etc/rancher/k3s# crictl pull rancher.ksd.top:5000/library/alpine
+Image is up to date for sha256:a24bb4013296f61e89ba57005a7b3e52274d8edd3ae2077d04395f806b63d83e
+root@rancher-server:/etc/rancher/k3s#
+```
 
 ### 非安全（http）私有仓库配置
 
@@ -72,75 +72,75 @@ containerd 使用了类似 K8S 中 svc 与 endpoint 的概念，svc 可以理解
 
 如果你使用的是非安全（http）私有仓库，那么可以通过下面的参数来配置 k3s 连接私有仓库：
 
-   ```bash
-   root@ip-172-31-13-117:~# cat >> /etc/rancher/k3s/registries.yaml <<EOF
-   mirrors:
-   "172.31.6.200:5000":
-      endpoint:
-         - "http://172.31.6.200:5000"
-   EOF
-   systemctl restart k3s
-   ```
+```bash
+root@ip-172-31-13-117:~# cat >> /etc/rancher/k3s/registries.yaml <<EOF
+mirrors:
+  "172.31.6.200:5000":
+    endpoint:
+      - "http://172.31.6.200:5000"
+EOF
+systemctl restart k3s
+```
 
 然后就可以通过 crictl 去 pull 镜像：
 
-   ```bash
-   root@ip-172-31-13-117:~# crictl pull 172.31.6.200:5000/my-ubuntu
-   Image is up to date for sha256:9499db7817713c4d10240ca9f5386b605ecff7975179f5a46e7ffd59fff462ee
-   ```
+```bash
+root@ip-172-31-13-117:~# crictl pull 172.31.6.200:5000/my-ubuntu
+Image is up to date for sha256:9499db7817713c4d10240ca9f5386b605ecff7975179f5a46e7ffd59fff462ee
+```
 
 接下来，在看一下 containerd 的配置，可以看到文件末尾追加了如下配置：
 
-   ```json
-   root@ip-172-31-13-117:~# cat /var/lib/rancher/k3s/agent/etc/containerd/config.toml
-   [plugins.cri.registry.mirrors]
+```json
+root@ip-172-31-13-117:~# cat /var/lib/rancher/k3s/agent/etc/containerd/config.toml
+[plugins.cri.registry.mirrors]
 
-   [plugins.cri.registry.mirrors."172.31.6.200:5000"]
-   endpoint = ["http://172.31.6.200:5000"]
+[plugins.cri.registry.mirrors."172.31.6.200:5000"]
+  endpoint = ["http://172.31.6.200:5000"]
 
-   [plugins.cri.registry.mirrors."rancher.ksd.top:5000"]
-   endpoint = ["http://172.31.6.200:5000"]
-   ```
+[plugins.cri.registry.mirrors."rancher.ksd.top:5000"]
+  endpoint = ["http://172.31.6.200:5000"]
+```
 
 - 有认证
 
 如果你的非安全（http）私有仓库带有认证，那么可以通过下面的参数来配置 k3s 连接私有仓库：
 
-   ```bash
-   root@ip-172-31-13-117:~# cat >> /etc/rancher/k3s/registries.yaml <<EOF
-   mirrors:
-   "35.182.134.80":
-      endpoint:
-         - "http://35.182.134.80"
-   configs:
-   "35.182.134.80":
-      auth:
-         username: admin # this is the registry username
-         password: Harbor12345 # this is the registry password
-   EOF
-   systemctl restart k3s
-   ```
+```bash
+root@ip-172-31-13-117:~# cat >> /etc/rancher/k3s/registries.yaml <<EOF
+mirrors:
+  "35.182.134.80":
+    endpoint:
+      - "http://35.182.134.80"
+configs:
+  "35.182.134.80":
+    auth:
+      username: admin # this is the registry username
+      password: Harbor12345 # this is the registry password
+EOF
+systemctl restart k3s
+```
 
 通过 crictl 去 pull 镜像：
 
-   ```bash
-   root@ip-172-31-13-117:~# crictl pull 35.182.134.80/ksd/ubuntu:16.04
-   Image is up to date for sha256:9499db7817713c4d10240ca9f5386b605ecff7975179f5a46e7ffd59fff462ee
-   ```
+```bash
+root@ip-172-31-13-117:~# crictl pull 35.182.134.80/ksd/ubuntu:16.04
+Image is up to date for sha256:9499db7817713c4d10240ca9f5386b605ecff7975179f5a46e7ffd59fff462ee
+```
 
 Containerd 配置文件末尾追加了如下配置：
 
-   ```json
-   root@ip-172-31-13-117:~# cat /var/lib/rancher/k3s/agent/etc/containerd/config.toml
-   [plugins.cri.registry.mirrors]
+```json
+root@ip-172-31-13-117:~# cat /var/lib/rancher/k3s/agent/etc/containerd/config.toml
+[plugins.cri.registry.mirrors]
 
-   [plugins.cri.registry.mirrors."35.182.134.80"]
-   endpoint = ["http://35.182.134.80"]
+[plugins.cri.registry.mirrors."35.182.134.80"]
+  endpoint = ["http://35.182.134.80"]
 
-   [plugins.cri.registry.configs."35.182.134.80".auth]
-   username = "admin"
-   password = "Harbor12345"
-   ```
+[plugins.cri.registry.configs."35.182.134.80".auth]
+  username = "admin"
+  password = "Harbor12345"
+```
 
 ### 安全（https）私有仓库配置
 
@@ -150,195 +150,195 @@ Containerd 配置文件末尾追加了如下配置：
 
 与非安全（http）私有仓库配置类似，只需要配置 endpoint 对应的仓库地址为 https 即可。
 
-   ```bash
-   root@ip-172-31-13-117:~# cat >> /etc/rancher/k3s/registries.yaml <<EOF
-   mirrors:
-   "harbor.kingsd.top":
-      endpoint:
-         - "https://harbor.kingsd.top"
-   configs:
-   "harbor.kingsd.top":
-      auth:
-         username: admin # this is the registry username
-         password: Harbor12345 # this is the registry password
-   EOF
-   systemctl restart k3s
-   ```
+```bash
+root@ip-172-31-13-117:~# cat >> /etc/rancher/k3s/registries.yaml <<EOF
+mirrors:
+  "harbor.kingsd.top":
+    endpoint:
+      - "https://harbor.kingsd.top"
+configs:
+  "harbor.kingsd.top":
+    auth:
+      username: admin # this is the registry username
+      password: Harbor12345 # this is the registry password
+EOF
+systemctl restart k3s
+```
 
 通过 crictl 去 pull 镜像：
 
-   ```bash
-   root@ip-172-31-13-117:~# crictl pull harbor.kingsd.top/ksd/ubuntu:16.04
-   Image is up to date for sha256:9499db7817713c4d10240ca9f5386b605ecff7975179f5a46e7ffd59fff462ee
-   ```
+```bash
+root@ip-172-31-13-117:~# crictl pull harbor.kingsd.top/ksd/ubuntu:16.04
+Image is up to date for sha256:9499db7817713c4d10240ca9f5386b605ecff7975179f5a46e7ffd59fff462ee
+```
 
 Containerd 配置文件末尾追加了如下配置：
 
-   ```json
-   root@ip-172-31-13-117:~# cat /var/lib/rancher/k3s/agent/etc/containerd/config.toml
-   [plugins.cri.registry.mirrors]
+```json
+root@ip-172-31-13-117:~# cat /var/lib/rancher/k3s/agent/etc/containerd/config.toml
+[plugins.cri.registry.mirrors]
 
-   [plugins.cri.registry.mirrors."harbor.kingsd.top"]
-   endpoint = ["https://harbor.kingsd.top"]
+[plugins.cri.registry.mirrors."harbor.kingsd.top"]
+  endpoint = ["https://harbor.kingsd.top"]
 
-   [plugins.cri.registry.configs."harbor.kingsd.top".auth]
-   username = "admin"
-   password = "Harbor12345"
-   ```
+[plugins.cri.registry.configs."harbor.kingsd.top".auth]
+  username = "admin"
+  password = "Harbor12345"
+```
 
 - 使用自签 ssl 证书
 
 如果后端仓库使用的是自签名的 ssl 证书，那么需要配置 CA 证书 用于 ssl 证书的校验。
 
-   ```bash
-   root@ip-172-31-13-117:~# cat >> /etc/rancher/k3s/registries.yaml <<EOF
-   mirrors:
-   "harbor-ksd.kingsd.top":
-      endpoint:
-         - "https://harbor-ksd.kingsd.top"
-   configs:
-   "harbor-ksd.kingsd.top":
-      auth:
-         username: admin # this is the registry username
-         password: Harbor12345 # this is the registry password
-      tls:
-         ca_file: /opt/certs/ca.crt
-   EOF
-   systemctl restart k3s
-   ```
+```bash
+root@ip-172-31-13-117:~# cat >> /etc/rancher/k3s/registries.yaml <<EOF
+mirrors:
+  "harbor-ksd.kingsd.top":
+    endpoint:
+      - "https://harbor-ksd.kingsd.top"
+configs:
+  "harbor-ksd.kingsd.top":
+    auth:
+      username: admin # this is the registry username
+      password: Harbor12345 # this is the registry password
+    tls:
+      ca_file: /opt/certs/ca.crt
+EOF
+systemctl restart k3s
+```
 
 通过 crictl 去 pull 镜像：
 
-   ```bash
-   root@ip-172-31-13-117:~# crictl pull harbor-ksd.kingsd.top/ksd/ubuntu:16.04
-   Image is up to date for sha256:9499db7817713c4d10240ca9f5386b605ecff7975179f5a46e7ffd59fff462ee
-   ```
+```bash
+root@ip-172-31-13-117:~# crictl pull harbor-ksd.kingsd.top/ksd/ubuntu:16.04
+Image is up to date for sha256:9499db7817713c4d10240ca9f5386b605ecff7975179f5a46e7ffd59fff462ee
+```
 
 Containerd 配置文件末尾追加了如下配置：
 
-   ```json
-   root@ip-172-31-13-117:~# cat /var/lib/rancher/k3s/agent/etc/containerd/config.toml
-   [plugins.cri.registry.mirrors]
+```json
+root@ip-172-31-13-117:~# cat /var/lib/rancher/k3s/agent/etc/containerd/config.toml
+[plugins.cri.registry.mirrors]
 
-   [plugins.cri.registry.mirrors."harbor-ksd.kingsd.top"]
-   endpoint = ["https://harbor-ksd.kingsd.top"]
+[plugins.cri.registry.mirrors."harbor-ksd.kingsd.top"]
+  endpoint = ["https://harbor-ksd.kingsd.top"]
 
-   [plugins.cri.registry.configs."harbor-ksd.kingsd.top".auth]
-   username = "admin"
-   password = "Harbor12345"
+[plugins.cri.registry.configs."harbor-ksd.kingsd.top".auth]
+  username = "admin"
+  password = "Harbor12345"
 
-   [plugins.cri.registry.configs."harbor-ksd.kingsd.top".tls]
-   ca_file = "/opt/certs/ca.crt"
-   ```
+[plugins.cri.registry.configs."harbor-ksd.kingsd.top".tls]
+  ca_file = "/opt/certs/ca.crt"
+```
 
 - ssl 双向认证
 
 如果镜像仓库配置了双向认证，那么需要为 containerd 配置 ssl 证书用于 镜像仓库对 containerd 做认证。
 
-   ```bash
-   root@ip-172-31-13-117:~# cat >> /etc/rancher/k3s/registries.yaml <<EOF
-   mirrors:
-   "harbor-ksd.kingsd.top":
-      endpoint:
-         - "https://harbor-ksd.kingsd.top"
-   configs:
-   "harbor-ksd.kingsd.top":
-      auth:
-         username: admin # this is the registry username
-         password: Harbor12345 # this is the registry password
-      tls:
-         ca_file: /opt/certs/ca.crt # path to the ca file used in the registry
-         cert_file: /opt/certs/harbor-ksd.kingsd.top.cert # path to the cert file used in the registry
-         key_file: /opt/certs/harbor-ksd.kingsd.top.key # path to the key file used in the registry
-   EOF
-   systemctl restart k3s
-   ```
+```bash
+root@ip-172-31-13-117:~# cat >> /etc/rancher/k3s/registries.yaml <<EOF
+mirrors:
+  "harbor-ksd.kingsd.top":
+    endpoint:
+      - "https://harbor-ksd.kingsd.top"
+configs:
+  "harbor-ksd.kingsd.top":
+    auth:
+      username: admin # this is the registry username
+      password: Harbor12345 # this is the registry password
+    tls:
+      ca_file: /opt/certs/ca.crt # path to the ca file used in the registry
+      cert_file: /opt/certs/harbor-ksd.kingsd.top.cert # path to the cert file used in the registry
+      key_file: /opt/certs/harbor-ksd.kingsd.top.key # path to the key file used in the registry
+EOF
+systemctl restart k3s
+```
 
 通过 crictl 去 pull 镜像：
 
-   ```bash
-   root@ip-172-31-13-117:~# crictl pull harbor-ksd.kingsd.top/ksd/ubuntu:16.04
-   Image is up to date for sha256:9499db7817713c4d10240ca9f5386b605ecff7975179f5a46e7ffd59fff462ee
-   ```
+```bash
+root@ip-172-31-13-117:~# crictl pull harbor-ksd.kingsd.top/ksd/ubuntu:16.04
+Image is up to date for sha256:9499db7817713c4d10240ca9f5386b605ecff7975179f5a46e7ffd59fff462ee
+```
 
 Containerd 配置文件末尾追加了如下配置：
 
-   ```json
-   root@ip-172-31-13-117:~# cat /var/lib/rancher/k3s/agent/etc/containerd/config.toml
-   [plugins.cri.registry.mirrors]
+```json
+root@ip-172-31-13-117:~# cat /var/lib/rancher/k3s/agent/etc/containerd/config.toml
+[plugins.cri.registry.mirrors]
 
-   [plugins.cri.registry.mirrors."harbor-ksd.kingsd.top"]
-   endpoint = ["https://harbor-ksd.kingsd.top"]
+[plugins.cri.registry.mirrors."harbor-ksd.kingsd.top"]
+  endpoint = ["https://harbor-ksd.kingsd.top"]
 
-   [plugins.cri.registry.configs."harbor-ksd.kingsd.top".auth]
-   username = "admin"
-   password = "Harbor12345"
+[plugins.cri.registry.configs."harbor-ksd.kingsd.top".auth]
+  username = "admin"
+  password = "Harbor12345"
 
-   [plugins.cri.registry.configs."harbor-ksd.kingsd.top".tls]
-   ca_file = "/opt/certs/ca.crt"
-   cert_file = "/opt/certs/harbor-ksd.kingsd.top.cert"
-   key_file = "/opt/certs/harbor-ksd.kingsd.top.key"
-   ```
+[plugins.cri.registry.configs."harbor-ksd.kingsd.top".tls]
+  ca_file = "/opt/certs/ca.crt"
+  cert_file = "/opt/certs/harbor-ksd.kingsd.top.cert"
+  key_file = "/opt/certs/harbor-ksd.kingsd.top.key"
+```
 
 ### 加速器配置
 
-Containerd 与 docker 都有默认仓库，均为 `docker.io` 。 如果配置中未指定 mirror 为 `docker.io`，containerd 后会自动加载 `docker.io` 配置。与 docker 不同的是，containerd 可以修改 `docker.io` 对应的 endpoint（默认为 https://registry-1.docker.io），而 docker 无法修改。
+Containerd 与 docker 都有默认仓库，均为 `docker.io`。 如果配置中未指定 mirror 为 `docker.io`，containerd 后会自动加载 `docker.io` 配置。与 docker 不同的是，containerd 可以修改 `docker.io` 对应的 endpoint（默认为 https://registry-1.docker.io），而 docker 无法修改。
 
 Docker 中可以通过 `registry-mirrors` 设置镜像加速地址。如果 pull 的镜像不带仓库地址（`项目名+镜像名:tag`），则会从默认镜像仓库去拉取镜像。如果配置了镜像加速地址，会先访问镜像加速仓库，如果没有返回数据，再访问默认的镜像仓库。
 
 Containerd 目前没有直接配置镜像加速的功能，但 containerd 中可以修改 `docker.io` 对应的 endpoint，所以可以通过修改 endpoint 来实现镜像加速下载。因为 endpoint 是轮训访问，所以可以给 `docker.io` 配置多个仓库地址来实现 `加速地址+默认仓库地址`。如下配置示例：
 
-   ```bash
-   cat >> /etc/rancher/k3s/registries.yaml <<EOF
-   mirrors:
-   "docker.io":
-      endpoint:
-         - "https://fogjl973.mirror.aliyuncs.com"
-         - "https://registry-1.docker.io"
-   EOF
+```bash
+cat >> /etc/rancher/k3s/registries.yaml <<EOF
+mirrors:
+  "docker.io":
+    endpoint:
+      - "https://fogjl973.mirror.aliyuncs.com"
+      - "https://registry-1.docker.io"
+EOF
 
-   systemctl restart k3s
-   ```
+systemctl restart k3s
+```
 
 Containerd 配置文件末尾追加了如下配置：
 
-   ```bash
-   root@ip-172-31-13-117:~# cat /var/lib/rancher/k3s/agent/etc/containerd/config.toml
-   [plugins.cri.registry.mirrors]
+```bash
+root@ip-172-31-13-117:~# cat /var/lib/rancher/k3s/agent/etc/containerd/config.toml
+[plugins.cri.registry.mirrors]
 
-   [plugins.cri.registry.mirrors."docker.io"]
-   endpoint = ["https://fogjl973.mirror.aliyuncs.com", "https://registry-1.docker.io"]
-   ```
+[plugins.cri.registry.mirrors."docker.io"]
+  endpoint = ["https://fogjl973.mirror.aliyuncs.com", "https://registry-1.docker.io"]
+```
 
 ### 完整配置示例
 
-   ```yaml
-   mirrors:
-   "192.168.50.119":
-      endpoint:
-         - "http://192.168.50.119"
-   "docker.io":
-      endpoint:
-         - "https://fogjl973.mirror.aliyuncs.com"
-         - "https://registry-1.docker.io"
-   configs:
-   "192.168.50.119":
-      auth:
-         username: '' # this is the registry username
-         password: '' # this is the registry password
-      tls:
-         cert_file: '' # path to the cert file used in the registry
-         key_file: '' # path to the key file used in the registry
-         ca_file: '' # path to the ca file used in the registry
-   "docker.io":
-      auth:
-         username: '' # this is the registry username
-         password: '' # this is the registry password
-      tls:
-         cert_file: '' # path to the cert file used in the registry
-         key_file: '' # path to the key file used in the registry
-         ca_file: '' # path to the ca file used in the registry
-   ```
+```yaml
+mirrors:
+  "192.168.50.119":
+    endpoint:
+      - "http://192.168.50.119"
+  "docker.io":
+    endpoint:
+      - "https://fogjl973.mirror.aliyuncs.com"
+      - "https://registry-1.docker.io"
+configs:
+  "192.168.50.119":
+    auth:
+      username: '' # this is the registry username
+      password: '' # this is the registry password
+    tls:
+      cert_file: '' # path to the cert file used in the registry
+      key_file: '' # path to the key file used in the registry
+      ca_file: '' # path to the ca file used in the registry
+  "docker.io":
+    auth:
+      username: '' # this is the registry username
+      password: '' # this is the registry password
+    tls:
+      cert_file: '' # path to the cert file used in the registry
+      key_file: '' # path to the key file used in the registry
+      ca_file: '' # path to the ca file used in the registry
+```
 
 ## 参考
 
