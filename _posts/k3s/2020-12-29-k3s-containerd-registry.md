@@ -72,7 +72,7 @@ root@rancher-server:/etc/rancher/k3s#
 
 如果你使用的是非安全（http）私有仓库，那么可以通过下面的参数来配置 k3s 连接私有仓库：
 
-```bash
+```
 root@ip-172-31-13-117:~# cat >> /etc/rancher/k3s/registries.yaml <<EOF
 mirrors:
   "172.31.6.200:5000":
@@ -91,7 +91,7 @@ Image is up to date for sha256:9499db7817713c4d10240ca9f5386b605ecff7975179f5a46
 
 接下来，在看一下 containerd 的配置，可以看到文件末尾追加了如下配置：
 
-```json
+```
 root@ip-172-31-13-117:~# cat /var/lib/rancher/k3s/agent/etc/containerd/config.toml
 [plugins.cri.registry.mirrors]
 
