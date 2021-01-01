@@ -37,7 +37,7 @@ containerd 使用了类似 K8S 中 svc 与 endpoint 的概念，svc 可以理解
 
 比如以下配置示例：
 
-```yaml
+```
 mirrors:
   "172.31.6.200:5000":
     endpoint:
@@ -53,7 +53,7 @@ mirrors:
 
 可以通过 `crictl pull 172.31.6.200:5000/library/alpine` 和 `crictl pull rancher.ksd.top:5000/library/alpine`获取到镜像，但镜像都是从同一个仓库获取到的。
 
-```bash
+```
 root@rancher-server:/etc/rancher/k3s# systemctl restart k3s.service
 root@rancher-server:/etc/rancher/k3s# crictl pull 172.31.6.200:5000/library/alpine
 Image is up to date for sha256:a24bb4013296f61e89ba57005a7b3e52274d8edd3ae2077d04395f806b63d83e
@@ -84,7 +84,7 @@ systemctl restart k3s
 
 然后就可以通过 crictl 去 pull 镜像：
 
-```bash
+```
 root@ip-172-31-13-117:~# crictl pull 172.31.6.200:5000/my-ubuntu
 Image is up to date for sha256:9499db7817713c4d10240ca9f5386b605ecff7975179f5a46e7ffd59fff462ee
 ```
@@ -106,7 +106,7 @@ root@ip-172-31-13-117:~# cat /var/lib/rancher/k3s/agent/etc/containerd/config.to
 
 如果你的非安全（http）私有仓库带有认证，那么可以通过下面的参数来配置 k3s 连接私有仓库：
 
-```bash
+```
 root@ip-172-31-13-117:~# cat >> /etc/rancher/k3s/registries.yaml <<EOF
 mirrors:
   "35.182.134.80":
@@ -123,14 +123,14 @@ systemctl restart k3s
 
 通过 crictl 去 pull 镜像：
 
-```bash
+```
 root@ip-172-31-13-117:~# crictl pull 35.182.134.80/ksd/ubuntu:16.04
 Image is up to date for sha256:9499db7817713c4d10240ca9f5386b605ecff7975179f5a46e7ffd59fff462ee
 ```
 
 Containerd 配置文件末尾追加了如下配置：
 
-```json
+```
 root@ip-172-31-13-117:~# cat /var/lib/rancher/k3s/agent/etc/containerd/config.toml
 [plugins.cri.registry.mirrors]
 
@@ -150,7 +150,7 @@ root@ip-172-31-13-117:~# cat /var/lib/rancher/k3s/agent/etc/containerd/config.to
 
 与非安全（http）私有仓库配置类似，只需要配置 endpoint 对应的仓库地址为 https 即可。
 
-```bash
+```
 root@ip-172-31-13-117:~# cat >> /etc/rancher/k3s/registries.yaml <<EOF
 mirrors:
   "harbor.kingsd.top":
@@ -167,14 +167,14 @@ systemctl restart k3s
 
 通过 crictl 去 pull 镜像：
 
-```bash
+```
 root@ip-172-31-13-117:~# crictl pull harbor.kingsd.top/ksd/ubuntu:16.04
 Image is up to date for sha256:9499db7817713c4d10240ca9f5386b605ecff7975179f5a46e7ffd59fff462ee
 ```
 
 Containerd 配置文件末尾追加了如下配置：
 
-```json
+```
 root@ip-172-31-13-117:~# cat /var/lib/rancher/k3s/agent/etc/containerd/config.toml
 [plugins.cri.registry.mirrors]
 
@@ -190,7 +190,7 @@ root@ip-172-31-13-117:~# cat /var/lib/rancher/k3s/agent/etc/containerd/config.to
 
 如果后端仓库使用的是自签名的 ssl 证书，那么需要配置 CA 证书 用于 ssl 证书的校验。
 
-```bash
+```
 root@ip-172-31-13-117:~# cat >> /etc/rancher/k3s/registries.yaml <<EOF
 mirrors:
   "harbor-ksd.kingsd.top":
@@ -209,14 +209,14 @@ systemctl restart k3s
 
 通过 crictl 去 pull 镜像：
 
-```bash
+```
 root@ip-172-31-13-117:~# crictl pull harbor-ksd.kingsd.top/ksd/ubuntu:16.04
 Image is up to date for sha256:9499db7817713c4d10240ca9f5386b605ecff7975179f5a46e7ffd59fff462ee
 ```
 
 Containerd 配置文件末尾追加了如下配置：
 
-```json
+```
 root@ip-172-31-13-117:~# cat /var/lib/rancher/k3s/agent/etc/containerd/config.toml
 [plugins.cri.registry.mirrors]
 
@@ -235,7 +235,7 @@ root@ip-172-31-13-117:~# cat /var/lib/rancher/k3s/agent/etc/containerd/config.to
 
 如果镜像仓库配置了双向认证，那么需要为 containerd 配置 ssl 证书用于 镜像仓库对 containerd 做认证。
 
-```bash
+```
 root@ip-172-31-13-117:~# cat >> /etc/rancher/k3s/registries.yaml <<EOF
 mirrors:
   "harbor-ksd.kingsd.top":
@@ -256,14 +256,14 @@ systemctl restart k3s
 
 通过 crictl 去 pull 镜像：
 
-```bash
+```
 root@ip-172-31-13-117:~# crictl pull harbor-ksd.kingsd.top/ksd/ubuntu:16.04
 Image is up to date for sha256:9499db7817713c4d10240ca9f5386b605ecff7975179f5a46e7ffd59fff462ee
 ```
 
 Containerd 配置文件末尾追加了如下配置：
 
-```json
+```
 root@ip-172-31-13-117:~# cat /var/lib/rancher/k3s/agent/etc/containerd/config.toml
 [plugins.cri.registry.mirrors]
 
@@ -288,7 +288,7 @@ Docker 中可以通过 `registry-mirrors` 设置镜像加速地址。如果 pull
 
 Containerd 目前没有直接配置镜像加速的功能，但 containerd 中可以修改 `docker.io` 对应的 endpoint，所以可以通过修改 endpoint 来实现镜像加速下载。因为 endpoint 是轮训访问，所以可以给 `docker.io` 配置多个仓库地址来实现 `加速地址+默认仓库地址`。如下配置示例：
 
-```bash
+```
 cat >> /etc/rancher/k3s/registries.yaml <<EOF
 mirrors:
   "docker.io":
@@ -302,7 +302,7 @@ systemctl restart k3s
 
 Containerd 配置文件末尾追加了如下配置：
 
-```bash
+```
 root@ip-172-31-13-117:~# cat /var/lib/rancher/k3s/agent/etc/containerd/config.toml
 [plugins.cri.registry.mirrors]
 
@@ -312,7 +312,7 @@ root@ip-172-31-13-117:~# cat /var/lib/rancher/k3s/agent/etc/containerd/config.to
 
 ### 完整配置示例
 
-```yaml
+```
 mirrors:
   "192.168.50.119":
     endpoint:
