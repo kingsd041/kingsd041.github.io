@@ -37,7 +37,7 @@ ERROR: https://rancher.sss.top/ping is not accessible (Could not resolve host: r
 
 但是，前提条件你需要获取业务集群的kubeconfig文件。 集群目前还没创建成功，没有办法通过UI去获取 kubeconfig 文件。既然 UI 上无法获取，我们可以 `controlplane` 节点 执行下面的命令来获取：
 
-`docker run --rm --net=host -v $(docker inspect kubelet --format '{{ range .Mounts }}{{ if eq .Destination "/etc/kubernetes" }}{{ .Source }}{{ end }}{{ end }}')/ssl:/etc/kubernetes/ssl:ro --entrypoint bash $(docker inspect $(docker images -q --filter=label=io.cattle.agent=true) --format='{{index .RepoTags 0}}' | tail -1) -c 'kubectl --kubeconfig /etc/kubernetes/ssl/kubecfg-kube-node.yaml get configmap -n kube-system full-cluster-state -o json | jq -r .data.\"full-cluster-state\" | jq -r .currentState.certificatesBundle.\"kube-admin\".config | sed -e "/^[[:space:]]*server:/ s_:.*_: \"https://127.0.0.1:6443\"_"' > kubeconfig_admin.yaml`
+docker run --rm --net=host -v $(docker inspect kubelet --format '{{ range .Mounts }}{{ if eq .Destination "/etc/kubernetes" }}{{ .Source }}{{ end }}{{ end }}')/ssl:/etc/kubernetes/ssl:ro --entrypoint bash $(docker inspect $(docker images -q --filter=label=io.cattle.agent=true) --format='{{index .RepoTags 0}}' | tail -1) -c 'kubectl --kubeconfig /etc/kubernetes/ssl/kubecfg-kube-node.yaml get configmap -n kube-system full-cluster-state -o json | jq -r .data.\"full-cluster-state\" | jq -r .currentState.certificatesBundle.\"kube-admin\".config | sed -e "/^[[:space:]]*server:/ s_:.*_: \"https://127.0.0.1:6443\"_"' > kubeconfig_admin.yaml
 
 执行成功后，会在当前目录生成 `kubeconfig_admin.yaml` 文件，接下来，可以按照[rancher 中文官网](https://docs.rancher.cn/docs/rancher2/faq/install/_index#error-httpsranchermyorgping-is-not-accessible-could-not-resolve-host-ranchermyorg)的操作来做域名和IP的映射
 
