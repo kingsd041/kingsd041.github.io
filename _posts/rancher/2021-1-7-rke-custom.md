@@ -74,6 +74,7 @@ ip-172-31-2-203   Ready    controlplane,etcd,worker   3m23s   v1.18.14
   ip-172-31-2-203   Ready    controlplane,etcd,worker   34m   v1.18.14
   ```
 
+
 3. 恢复下游业务集群的`cluster.rkestate`文件，在`controlplane`节点上运行以下命令：
 
   ```
@@ -89,6 +90,7 @@ ip-172-31-2-203   Ready    controlplane,etcd,worker   3m23s   v1.18.14
   ```
 
   > 可能因为博客对`{}` 有特殊处理，如果以上命令执行失败，可以从 https://gist.github.com/kingsd041/e6c6d93e77d705eae8eb144128bc5c5e 获得。
+
 
 4. 恢复下游业务集群的`cluster.yml`文件
 
@@ -181,6 +183,7 @@ ip-172-31-2-203   Ready    controlplane,etcd,worker   3m23s   v1.18.14
   cat cluster.rkestate  | jq -r .desiredState.rkeConfig.systemImages | yq r - | sed 's/^/  /' >> cluster.yml
   echo "" >> cluster.yml
   ```
+
 
 5. 使用 RKE 在原有集群上新增节点。
 
