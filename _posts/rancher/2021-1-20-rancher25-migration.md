@@ -75,7 +75,7 @@ sudo docker run -d --privileged --restart=unless-stopped \
 4. 单击 `Rancher Backup` operator
 5. 所有选项默认即可，直接点击`Install`创建`Rancher Backup` operator
 
-`rancher-backup`和`rancher-backup-crd`状态为`Deployed`，代表 rancher-backup operator 成功部署。
+  `rancher-backup`和`rancher-backup-crd`状态为`Deployed`，代表 rancher-backup operator 成功部署。
   ![](https://tva1.sinaimg.cn/large/008eGmZEly1gmt0hx0sd6j31o60u0aet.jpg)
 
 #### 创建备份
