@@ -90,7 +90,6 @@ cloud-init clean && rm -rf /var/lib/cloud/*
   ```
 
 7. 清空`/etc/machine-id`
-
   18.04默认使用/etc/machine-id作为 dhcp identifier，如果不清空，使用相同模板创建的vm，对应的IP是相同的。
   ```
 echo -n > /etc/machine-id
@@ -105,9 +104,9 @@ history -w
   ```
 
 9. 关机
-```
-shutdown -h now
-```
+  ```
+  shutdown -h now
+  ```
 
 #### 生成模板
 
