@@ -54,7 +54,6 @@ qm set 9000 --boot c --bootdisk scsi0
   ```
 
 2. 修改apt 源为阿里源
-
   ```
   cat /etc/apt/sources.list
   deb http://mirrors.aliyun.com/ubuntu/ bionic main restricted universe multiverse
@@ -70,41 +69,35 @@ qm set 9000 --boot c --bootdisk scsi0
   ```
 
 3. 注释掉apt 的配置，否则会继续沿用默认的apt配置
-
   ```
   vi /etc/cloud/cloud.cfg
   # - apt-configure
   ```
 
 4. 清除hostname
-
   ```
   truncate -s0 /etc/hostname
   ```
 
 5. 停用apt自动更新
-
   ```
   systemctl mask apt-daily.service apt-daily-upgrade.service
   ```
 
 6. 清理cloud-init
-
-```
-cloud-init clean && rm -rf /var/lib/cloud/*
-```
+  ```
+  cloud-init clean && rm -rf /var/lib/cloud/*
+  ```
 
 7. 清空`/etc/machine-id`
 
   18.04默认使用/etc/machine-id作为 dhcp identifier，如果不清空，使用相同模板创建的vm，对应的IP是相同的。
-
   ```
   echo -n > /etc/machine-id
   ```
   > 参考：https://superuser.com/questions/1338510/wrong-ip-address-from-dhcp-client-on-ubuntu-18-04
 
 8. 清理残留log，清理bash history
-
   ```
   apt clean
   cat /dev/null > ~/.bash_history && history -c
@@ -112,7 +105,6 @@ cloud-init clean && rm -rf /var/lib/cloud/*
   ```
 
 9. 关机
-
 ```
  shutdown -h now
 ```
