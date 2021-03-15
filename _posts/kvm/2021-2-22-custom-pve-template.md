@@ -23,26 +23,35 @@ tags:
 #### 创建vm，导入镜像
 
 ```
-# 创建vm
-qm create 9000 --cores 2 --memory 4096 --name ubuntu-bionic-server-template --net0 virtio,bridge=vmbr0
+#!/bin/bash
+
+VM_NAME=ubuntu-bionic-server-template
+VM_ID=9006
+VM_CORES=2
+VM_MEM=4096
+VM_IMAGE=bionic-server-cloudimg-amd64.img
+VM_DISK=40G
+
+qm create $VM_ID --cores $VM_CORES --memory $VM_MEM --name $VM_NAME --net0 virtio,bridge=vmbr0
 
 # 导入下载的镜像到local-lvm 存储空间
-qm importdisk 9000 bionic-server-cloudimg-amd64.img local-lvm
+qm importdisk $VM_ID $VM_IMAGE local-lvm
 
 # 将导入的磁盘以 scsi 方式挂载到虚拟机上面
-qm set 9000 --scsihw virtio-scsi-pci --scsi0 local-lvm:vm-9000-disk-0
+qm set $VM_ID --scsihw virtio-scsi-pci --scsi0 local-lvm:vm-$VM_ID-disk-0
 
 # 添加 Cloud-Init CDROM 驱动（必须添加这个vm才能启动cloud-init）
-qm set 9000 --ide2 local-lvm:cloudinit
+qm set $VM_ID --ide2 local-lvm:cloudinit
 
 # resize 磁盘
-qm resize 9000 scsi0 40G
+qm resize $VM_ID scsi0 $VM_DISK
 
 # 设置启动
-qm set 9000 --boot c --bootdisk scsi0
+qm set $VM_ID --boot c --bootdisk scsi0
 ```
 
 ####  设置 cloud-init 
+
 
 ![](https://tva1.sinaimg.cn/large/008eGmZEly1gnwf4ux214j31lm0lu0u2.jpg)
 
@@ -105,7 +114,7 @@ history -w
 
 9. 关机
   ```
-  shutdown -h now
+shutdown -h now
   ```
 
 #### 生成模板
