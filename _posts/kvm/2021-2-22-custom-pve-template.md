@@ -88,6 +88,14 @@ vi /etc/cloud/cloud.cfg
 truncate -s0 /etc/hostname
   ```
 
+4. 修改/etc/issue,将IP显示在console
+  ```
+vi /etc/issue
+IP: \4{eth0}
+# or IP: \4
+
+  ```
+
 5. 停用apt自动更新
   ```
 systemctl mask apt-daily.service apt-daily-upgrade.service
