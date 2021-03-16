@@ -91,8 +91,7 @@ truncate -s0 /etc/hostname
 4. 修改/etc/issue,将IP显示在console
   ```
 vi /etc/issue
-IP: \4{eth0}
-# or IP: \4
+IP: \4{eth0} # or IP: \4
 
   ```
 
