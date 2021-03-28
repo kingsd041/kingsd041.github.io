@@ -123,5 +123,3 @@ root@ip-172-31-12-164:~# ip addr
     inet 10.42.0.8/32 scope global eth0
        valid_lft forever preferred_lft forever
 ```
-
-## 
