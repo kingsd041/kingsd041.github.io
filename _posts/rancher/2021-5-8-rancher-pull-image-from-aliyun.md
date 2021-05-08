@@ -25,13 +25,14 @@ tags:
 
 ## Demo
 
-1. 获取支持 `--from-aliyun true` 参数的 `rancher-save-images.sh`
+#### Step-1. 获取支持 `--from-aliyun true` 参数的 `rancher-save-images.sh`
 
 浏览器访问 http://mirror.rancher.cn，然后导航到 rancher 目录下，选择对应的 rancher 版本，下载 `rancher-save-images.sh`。`rancher-images.txt` 和 `rancher-load-images.sh` 从 http://mirror.rancher.cn 或 [Rancher release](https://github.com/rancher/rancher/releases) 下载均可，无差别。
 
 ![](https://tva1.sinaimg.cn/large/008i3skNly1gqavazb44fj31ch0u04ar.jpg)
 
-2. 从阿里云镜像仓库拉取镜像并打包
+#### Step-2. 从阿里云镜像仓库拉取镜像并打包
+
 ```
 root@ip-172-31-21-94:~/image# ./rancher-save-images.sh -h
 USAGE: ./rancher-save-images.sh [--image-list rancher-images.txt] [--images rancher-images.tar.gz] [--from-aliyun true]
@@ -53,7 +54,7 @@ Image pull success: registry.cn-hangzhou.aliyuncs.com/rancher/coredns-coredns:1.
 
 脚本执行成功后会在当前目录生成 `rancher-images.tar.gz` 的镜像压缩包。
 
-3. 推送镜像到私有镜像库
+#### Step-3. 推送镜像到私有镜像库
 
 这一步，你将使用脚本将文件 `rancher-images.tar.gz` 中的镜像上传到您自己的私有镜像库。
 
