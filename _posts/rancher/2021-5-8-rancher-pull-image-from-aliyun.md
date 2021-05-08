@@ -26,7 +26,6 @@ tags:
 ## Demo
 
 1. 获取支持 `--from-aliyun true` 参数的 `rancher-save-images.sh`
-
   浏览器访问 http://mirror.rancher.cn，然后导航到 rancher 目录下，选择对应的 rancher 版本，下载 `rancher-save-images.sh`。`rancher-images.txt` 和 `rancher-load-images.sh` 从 http://mirror.rancher.cn 或 [Rancher release](https://github.com/rancher/rancher/releases) 下载均可，无差别。
 
   ![](https://tva1.sinaimg.cn/large/008i3skNly1gqavazb44fj31ch0u04ar.jpg)
@@ -48,29 +47,22 @@ tags:
   Image pull success: registry.cn-hangzhou.aliyuncs.com/rancher/coredns-coredns:1.6.2
   ...
   ```
-
   从以上日志中可以看出使用 `--from-aliyun true` 指定了从阿里云镜像仓库去拉取镜像，速度相比从 dockerhub 拉镜像要快了 N 倍。
-
   脚本执行成功后会在当前目录生成 `rancher-images.tar.gz` 的镜像压缩包。
 
 3. 推送镜像到私有镜像库
-
   这一步，你将使用脚本将文件 `rancher-images.tar.gz` 中的镜像上传到您自己的私有镜像库。
-
   文件 `rancher-images.txt` 、 `rancher-images.tar.gz` 应该和 `rancher-load-images.sh` 脚本的同一目录下。
 
   - 登录私有镜像库
-
   ```
   docker login harbor.kingsd.top
   ```
 
   - 推送镜像
-
   ```
   ./rancher-load-images.sh --registry harbor.kingsd.top
   ```
-
   等待执行成功后，就可以到私有镜像仓库中查看到所有 rancher 需要的镜像已经上传。
 
 ## 后记
