@@ -37,11 +37,11 @@ E0511 08:39:56.060906      28 pod_workers.go:191] Error syncing pod d0f83155-f02
 - 私有仓库为自签名证书（https），有认证
 - 私有仓库不使用 SSL（使用 http），有认证
 
-### 私有仓库为 SSL 证书颁发机构颁发的证书（https），有认证
+#### 私有仓库为 SSL 证书颁发机构颁发的证书（https），有认证
 
 > 私有仓库中已经提前上传了 Rancher Server 所需要的镜像，如何同步镜像到私有镜像仓库可以参考[官方文档](http://docs.rancher.cn/docs/rancher2.5/installation/other-installation-methods/air-gap/populate-private-registry/_index)
 
-#### Step 1. 配置 K3s `registries.yaml`
+**1. 配置 K3s `registries.yaml`**
 
 ```
 root@ip-172-31-14-159:~# cat /opt/registries.yaml
@@ -57,7 +57,7 @@ configs:
       password: Password  # 这是私有镜像仓库的密码
 ```
 
-#### Step 2. 启动单节点 Rancher Server
+**2. 启动单节点 Rancher Server**
 
 ```
 root@ip-172-31-14-159:~# docker run -itd --privileged \
@@ -68,7 +68,7 @@ root@ip-172-31-14-159:~# docker run -itd --privileged \
 >     rancher/rancher:v2.5.8
 ```
 
-#### Step 3. 验证
+**3. 验证**
 
 等待 Rancher Server 启动成功后，我们可以 exec 到容器内确认所需要的组件是否启动：
 
@@ -101,11 +101,11 @@ harbor.kingsd.top/rancher/shell              v0.1.6              2e550736e6a49  
 
 可以看到，除了 Rancher Server 内置的 `rancher/coredns-coredns` 和 `rancher/pause` 镜像以外，其他的镜像都是从 `harbor.kingsd.top` 拉取。
 
-### 私有仓库为自签名证书（https），有认证
+#### 私有仓库为自签名证书（https），有认证
 
 Rancher Server 连接自签名证书的私有仓库和 SSL 证书颁发机构的私有仓库配置的区别主要在于连接自签名证书的私有仓库时需要在 k3s 的`registries.yaml`中指定私有镜像仓库的自签名证书。
 
-#### Step 1. 配置 K3s `registries.yaml`
+**1. 配置 K3s `registries.yaml`**
 
 ```
 root@ip-172-31-14-159:~# cat /opt/registries.yaml
@@ -125,7 +125,7 @@ configs:
       key_file: /opt/certs/harbor.kingsd.top.key # 镜像仓库中使用的key文件的路径。
 ```
 
-#### Step 2. 启动单节点 Rancher Server
+**2. 启动单节点 Rancher Server**
 
 ```
 root@ip-172-31-14-159:~# docker run -itd --privileged \
@@ -137,7 +137,7 @@ root@ip-172-31-14-159:~# docker run -itd --privileged \
 >     rancher/rancher:v2.5.8
 ```
 
-#### Step 3. 验证
+**3. 验证**
 
 等待 Rancher Server 启动成功后，我们可以 exec 到容器内确认所需要的组件是否启动：
 
@@ -170,11 +170,11 @@ harbor.kingsd.top/rancher/shell              v0.1.6              2e550736e6a49  
 
 可以看到，除了 Rancher Server 内置的 `rancher/coredns-coredns` 和 `rancher/pause` 镜像以外，其他的镜像都是从 `harbor.kingsd.top` 拉取。
 
-### 私有仓库不使用 SSL（使用 http），有认证
+#### 私有仓库不使用 SSL（使用 http），有认证
 
 针对 HTTP 的私有仓库，只需要将 `registries.yaml` 里的 mirrors.endpoint 配置修改为`http` 开头即可。
 
-#### Step 1. 配置 K3s `registries.yaml`
+**1. 配置 K3s `registries.yaml`**
 
 ```
 
@@ -192,7 +192,7 @@ configs:
       password: Password  # 这是私有镜像仓库的密码
 ```
 
-#### Step 2. 启动单节点 Rancher Server
+**2. 启动单节点 Rancher Server**
 
 ```
 root@ip-172-31-14-159:~# docker run -itd --privileged \
@@ -203,7 +203,7 @@ root@ip-172-31-14-159:~# docker run -itd --privileged \
 >     rancher/rancher:v2.5.8
 ```
 
-#### Step 3. 验证
+**3. 验证**
 
 ```
 root@cb018bb70446:/var/lib/rancher# kubectl get pods -A
