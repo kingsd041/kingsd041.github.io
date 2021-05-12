@@ -1,14 +1,14 @@
 ---
 layout: post
 title: K8s v1.20 无法挂载 nfs provisioner
-subtitle: unexpected error getting claim reference: selfLink was empty, can't make reference
+subtitle: selfLink was empty, can't make reference
 date: 2021-5-12 21:07:00 +0800
 author: Ksd
 header-img: img/post-bg-desk.jpg
 catalog: true
 tags:
   - Rancher
-  - Airgap
+  - NFS
 ---
 
 如果你的 K8S 集群是 v1.20+，在 nfs provisioner 创建 pvc 时，nfs provisioner 会报错：
