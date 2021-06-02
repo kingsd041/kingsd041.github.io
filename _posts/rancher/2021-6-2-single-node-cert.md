@@ -43,7 +43,7 @@ docker restart <rancher_server_id>
 
 ### 2.4 +
 
-#### 1. `docker exec` 到 Rancher Server 容器内，执行：
+**1. `docker exec` 到 Rancher Server 容器内，执行：**
 
 ```
 kubectl --insecure-skip-tls-verify -n kube-system delete secrets k3s-serving
@@ -51,9 +51,9 @@ kubectl --insecure-skip-tls-verify delete secret serving-cert -n cattle-system
 rm -f /var/lib/rancher/k3s/server/tls/dynamic-cert.json
 ```
 
-#### 2. 重启 rancher-server
+**2. 重启 rancher-server**
 
-#### 3. 将 rancher ip 重新注入到新证书中，否则业务集群 agent 连接 Rancher Server 会有问题
+**3. 将 rancher ip 重新注入到新证书中，否则业务集群 agent 连接 Rancher Server 会有问题**
 
 ```
 curl --insecure -sfL https://server-url/v3
