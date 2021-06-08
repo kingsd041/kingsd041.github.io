@@ -33,7 +33,7 @@ Rancher v2.3+ 和 v2.4+ 内置的 K3s 版本分别是`1.17.x`和`1.18.x`，所�
 
 ## 手动轮转证书
 
-### 2.3 +
+### 2.3.x
 
 ```
 docker exec -ti <rancher_server_id> mv /var/lib/rancher/k3s/server/tls /var/lib/rancher/k3s/server/tlsbak
@@ -41,7 +41,7 @@ docker exec -ti <rancher_server_id> mv /var/lib/rancher/k3s/server/tls /var/lib/
 docker restart <rancher_server_id>
 ```
 
-### 2.4 +
+### 2.4.x 和 2.5.x 
 
 **1. `docker exec` 到 Rancher Server 容器内，执行：**
 
