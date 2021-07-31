@@ -53,5 +53,3 @@ docker run -d --restart=unless-stopped \
 ```
 sudo route add -net 192.168.1.0 192.168.30.10
 ```
-
-https://www.kancloud.cn/noahs/linux/1747306
