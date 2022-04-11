@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 突破K3s CA 证书10 年有效期的限制
+title: 单节点内置 ETCD 的 K3s 集群如何修改节点 IP
 subtitle:
 date: 2022-4-7 21:06:00 +0800
 author: Ksd
