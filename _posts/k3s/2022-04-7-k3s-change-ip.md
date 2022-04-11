@@ -2,14 +2,12 @@
 layout: post
 title: 单节点内置 ETCD 的 K3s 集群如何修改节点 IP
 subtitle:
-date: 2022-4-7 21:06:00 +0800
+date: 2022-4-11 21:06:00 +0800
 author: Ksd
 header-img: img/post-bg-desk.jpg
 catalog: true
 tags:
   - K3s
-  - cacert
-  - 证书
 ---
 
 ## 介绍
