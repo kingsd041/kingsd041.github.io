@@ -21,3 +21,12 @@ curl -sL https://raw.githubusercontent.com/rancher/kontainer-driver-metadata/rel
 ```
 curl -sL https://raw.githubusercontent.com/rancher/kontainer-driver-metadata/release-v2.6/data/data.json | jq -r '.rke2.releases[].version'
 ```
+
+## 获取 K3s 的 stable/latest/testing 等版本
+
+浏览器访问：https://update.k3s.io/v1-release/channels
+
+## 获取 RKE2 的 stable/latest/testing 等版本
+
+浏览器访问：https://update.rke2.io/v1-release/channels
+
