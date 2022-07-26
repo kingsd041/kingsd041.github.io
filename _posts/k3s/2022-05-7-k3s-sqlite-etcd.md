@@ -63,7 +63,7 @@ service/nginx        NodePort    10.43.254.106   <none>        80:30007/TCP   36
 首先，先停止 k3s 服务：
 
 ```
-root@ip-172-31-13-233:~# systemctl stop 3s
+root@ip-172-31-13-233:~# systemctl stop k3s
 ```
 
 然后，通过使用 `--cluster-init` 标志重新启动你的 k3s server 来将其转换为 etcd 集群：
@@ -141,3 +141,42 @@ service/nginx        NodePort    10.43.254.106   <none>        80:30007/TCP   6m
 ```
 
 从以上结果来看，转换为内置 etcd 数据库之后，业务数据并没有变化，不会影响你生产或测试环境。而且这些转换过程由 k3s 自动完成，不需要我们过多操作。
+
+## 迁移失败后如何恢复数据
+
+通过使用 `--cluster-init` 标志执行从 sqlite 迁移到 etcd 时，K3s 首先会将 sqlite 默认数据文件（/var/lib/rancher/k3s/server/db/state.db）备份为 `/var/lib/rancher/k3s/server/db/state.db.migrated`。然后创建 etcd 数据目录（/var/lib/rancher/k3s/server/db/etcd），并把转换后的 etcd 数据生成到该目录下。最后，通过 `--cluster-init` 标志告知 K3s 应该使用 etcd 启动该集群。
+
+```
+root@ip-172-31-8-83:~# ls /var/lib/rancher/k3s/server/db/
+etcd  state.db-shm  state.db-wal  state.db.migrated
+```
+
+所以，当我们迁移到 etcd 数据库失败时，只需要将 `state.db.migrated` 还原为 `state.db`，然后删除掉 etcd 文件夹，并且去掉 `--cluster-init` 标志重新启动 K3s 即可：
+
+```
+root@ip-172-31-8-83:~# service k3s stop
+root@ip-172-31-8-83:~# mv /var/lib/rancher/k3s/server/db/state.db.migrated /var/lib/rancher/k3s/server/db/state.db
+root@ip-172-31-8-83:~# rm -rf /var/lib/rancher/k3s/server/db/etcd
+root@ip-172-31-8-83:~# ls /var/lib/rancher/k3s/server/db/
+state.db  state.db-shm  state.db-wal
+root@ip-172-31-8-83:~# curl -sfL https://get.k3s.io | sh -
+[INFO]  Finding release for channel stable
+[INFO]  Using v1.23.6+k3s1 as release
+[INFO]  Downloading hash https://github.com/k3s-io/k3s/releases/download/v1.23.6+k3s1/sha256sum-amd64.txt
+[INFO]  Skipping binary downloaded, installed k3s matches hash
+[INFO]  Skipping installation of SELinux RPM
+[INFO]  Skipping /usr/local/bin/kubectl symlink to k3s, already exists
+[INFO]  Skipping /usr/local/bin/crictl symlink to k3s, already exists
+[INFO]  Skipping /usr/local/bin/ctr symlink to k3s, already exists
+[INFO]  Creating killall script /usr/local/bin/k3s-killall.sh
+[INFO]  Creating uninstall script /usr/local/bin/k3s-uninstall.sh
+[INFO]  env: Creating environment file /etc/systemd/system/k3s.service.env
+[INFO]  systemd: Creating service file /etc/systemd/system/k3s.service
+[INFO]  systemd: Enabling k3s unit
+Created symlink /etc/systemd/system/multi-user.target.wants/k3s.service → /etc/systemd/system/k3s.service.
+[INFO]  systemd: Starting k3s
+root@ip-172-31-8-83:~# kubectl get nodes
+NAME             STATUS   ROLES                  AGE     VERSION
+ip-172-31-2-70   Ready    <none>                 7m21s   v1.23.6+k3s1
+ip-172-31-8-83   Ready    control-plane,master   7m48s   v1.23.6+k3s1
+```
