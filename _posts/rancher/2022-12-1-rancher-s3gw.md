@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 你的 PV 是否需要 S3 访问权限？s3gw 为你提供保障
+title: 如何为 Longhorn 扩展对象存储能力
 subtitle:
 date: 2022-12-1 21:07:00 +0800
 author: Ksd
@@ -13,7 +13,7 @@ tags:
 
 在云原生环境中，非常重要的一个环节就是提供一个可以使用标准协议与客户端交互的存储系统。大家可能会马上联想到 “简单存储服务(Simple Storage Service, S3)”，S3 是一个庞大的协议，涵盖了存储桶、对象、密钥、版本控制、ACL 和区域等关键概念。
 
-Longhorn 是 Kubernetes 的分布式块存储系统。然而，Longhorn 目前**仅用于提供块设备**。那么，Longhorn 能否充当 S3 的服务器，并且提供单一的 AWS S3 API 接口来访问后端数据存储呢？
+Longhorn 是 Kubernetes 的分布式块存储系统。Longhorn 目前**只支持块存储和文件系统**。那么，Longhorn 能否充当 S3 的服务器，并且提供单一的 AWS S3 API 接口来访问后端数据存储呢？
 
 当然可以！但是你可能需要一个 S3 网关来向外部客户端提供对数据的访问权限。
 
@@ -25,7 +25,7 @@ s3gw(https://github.com/aquarist-labs/s3gw) 是一项与 S3 兼容的服务并�
 
 s3gw 基于 Ceph 的 RADOSGW (RGW)，但它作为独立服务运行，没有 RADOS 集群，并且依赖于 SUSE 存储团队持续开发的存储后端。目前 s3gw 仍处于开发的早期阶段，但它已经可以用于测试和使用一些 S3 功能。
 
-以上的介绍是通过 s3gw 官网直译过来的，如果大家还是不清楚什么是 s3gw，那大家可以把 s3gw 看成是一个减配版的 minio。只不过 s3gw 为了补充 Rancher 产品组合，目前重心放在和 Longhorn 的适配上，但该工具不限于 Rancher 产品。另外，minio 采用的是 `GNU AGPLv3 license`，而 s3gw 采用的是 `Apache License, Version 2.0`。
+以上的介绍是通过 s3gw 官网直译过来的，如果大家还是不清楚什么是 s3gw，那大家可以把 s3gw 看成是一个减配版的 minio。只不过 s3gw 为了补充 Rancher 产品组合，目前重心放在和 Longhorn 的适配上，但该工具不限于 Rancher 产品。另外，s3gw 采用的是 `Apache License, Version 2.0`，而 minio 部分组件采用的是 `GNU AGPLv3 license`。
 
 接下来，本文将介绍如何安装和使用 s3gw。
 
@@ -37,11 +37,13 @@ s3gw 依赖一个基础的 Kubernetes 集群和 Longhorn。本次介绍将通过
 
 为了节省篇幅，部署 Rancher 和 K3s 的步骤就不在本文中详细描述，大家可参考 Rancher 和 K3s 文档进行部署。
 
-基础环境如下：
+演示环境：
 
 - 操作系统：Ubuntu 20.04.5 LTS
 - Rancher 版本：rancher/rancher:v2.7.0
 - 下游 K3s 版本：v1.24.8+k3s1
+- s3gw chart：0.8.0
+- Longhorn chart：101.1.0+up1.3.2
 
 ### 部署 Longhorn
 
@@ -83,7 +85,7 @@ s3gw 依赖一个基础的 Kubernetes 集群和 Longhorn。本次介绍将通过
 
 以上，我们就完成了 s3gw 的安装，接下来，我们就可以验证 S3gw 的使用！
 
-## 测试 s3gw
+## 验证 s3gw
 
 默认情况下，s3gw chart 配置一个 ingress，该 ingress 指向具有 FQDN 的 S3 网关：`s3gw.local`。因此，你必须在 /etc/hosts 中定义 s3gw.local 指向主机物理接口之一的 IP 地址。
 
