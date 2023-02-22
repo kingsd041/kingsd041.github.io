@@ -22,7 +22,7 @@ tags:
 
 ## 说明
 
-### 关于证书
+#### 关于证书
 
 对于才接触 Rancher 的用户，很多都是卡在了证书的配置上。其实 Rancher 的证书配置非常简单，一共分为以下三种：
 
@@ -34,7 +34,7 @@ tags:
 
 本文介绍如何使用**自签名证书来安装高可用的 Rancher**，更多安装方式，可参考[官网文档](https://ranchermanager.docs.rancher.com/zh/pages-for-subheaders/install-upgrade-on-a-kubernetes-cluster)。
 
-### 关于 DNS
+#### 关于 DNS
 
 **生产环境安装 Rancher 高可用，需要有一个 DNS 服务器来解析 Rancher 的域名。**
 
@@ -48,7 +48,7 @@ tags:
 
 为了更好的指导安装，本文从一个裸机开始安装 local 集群，然后在 local 集群上部署高可用的 Rancher Server。
 
-### 安装环境
+#### 安装环境
 
 Rancher：v2.7.1
 
@@ -61,7 +61,7 @@ Rancher：v2.7.1
 
 > 本文只是为了演示高可用安装，所以 local 集群只使用了一台，如果是生产环境，建议使用 3 台。
 
-### 安装 local 集群
+#### 安装 local 集群
 
 > 重要:
 >
@@ -100,7 +100,7 @@ kube-system   svclb-traefik-11b66970-5q2sj              2/2     Running     0   
 kube-system   traefik-b44944bf7-5f87t                   1/1     Running     0          41s
 ```
 
-### 安装 helm 并设置 KUBECONFIG 环境变量
+#### 安装 helm 并设置 KUBECONFIG 环境变量
 
 ```
 root@demo-1:~# curl https://rancher-mirror.rancher.cn/helm/get-helm-3.sh | INSTALL_HELM_MIRROR=cn bash
@@ -109,7 +109,7 @@ root@demo-1:~# helm ls
 NAME	NAMESPACE	REVISION	UPDATED	STATUS	CHART	APP VERSION
 ```
 
-### 创建自签名证书
+#### 创建自签名证书
 
 生成证书脚本可参考 rancher 2.5 生成自签名证书的[文档](https://docs.rancher.cn/docs/rancher2/installation/resources/advanced/self-signed-ssl/_index/#4-%E5%A6%82%E4%BD%95%E7%94%9F%E6%88%90%E8%87%AA%E7%AD%BE%E5%90%8D%E8%AF%81%E4%B9%A6)
 
@@ -121,21 +121,21 @@ root@demo-1:~/cert# ls
 cacerts.pem  cacerts.srl  cakey.pem  create_self-signed-cert.sh  openssl.cnf  rancher.demo.cn.crt  rancher.demo.cn.csr  rancher.demo.cn.key  tls.crt  tls.key
 ```
 
-### 添加 Helm Chart 仓库
+#### 添加 Helm Chart 仓库
 
 ```
 root@demo-1:~# helm repo add rancher-stable https://releases.rancher.com/server-charts/stable
 "rancher-stable" has been added to your repositories
 ```
 
-### 为 Rancher 创建命名空间
+#### 为 Rancher 创建命名空间
 
 ```
 root@demo-1:~# kubectl create namespace cattle-system
 namespace/cattle-system created
 ```
 
-### 使用自签名证书部署 Rancher
+#### 使用自签名证书部署 Rancher
 
 ```
 root@demo-1:~# helm install rancher rancher-stable/rancher \
@@ -154,7 +154,7 @@ root@demo-1:~# helm install rancher rancher-stable/rancher \
 - 因为是自签名证书，所以需要这种 `ingress.tls.source=secret`
 - 因为是使用私有 CA 证书，所以需要设置 privateCA=true
 
-### 添加 TLS 密文
+#### 添加 TLS 密文
 
 ```
 root@demo-1:~/cert# ls
@@ -166,7 +166,7 @@ root@demo-1:~/cert#kubectl -n cattle-system create secret generic tls-ca \
   --from-file=cacerts.pem=./cacerts.pem
 ```
 
-### 确认安装完成
+#### 确认安装完成
 
 查看所有 rancher pod 的状态：
 
@@ -182,7 +182,7 @@ rancher-69b49b48c4-hcc55   1/1     Running   0          12m
 kubectl -n cattle-system logs -f -l app=rancher
 ```
 
-### 安装 LB
+#### 安装 LB
 
 虽然本文演示环境的 local 集群只有 1 个节点和 1 个 rancher 副本，但生产环境建议使用 3 个节点的 local 集群和 3 个副本的 rancher pod。
 
@@ -237,7 +237,7 @@ root@demo-2:~# docker run -d --restart=unless-stopped \
   nginx:1.14
 ```
 
-### 修改域名和 LB 的映射记录
+#### 修改域名和 LB 的映射记录
 
 如果内网有 dns 服务器，直接在 dns 服务器上修改即可。如果没有可以在 PC 端的 hosts 文件中修改也可以，比如我在我 mac 电脑的 /etc/hosts 文件中增加以下映射记录：
 
@@ -246,7 +246,7 @@ root@demo-2:~# docker run -d --restart=unless-stopped \
 192.168.205.30 rancher.demo.cn
 ```
 
-### 访问 Rancher Server
+#### 访问 Rancher Server
 
 从浏览器直接访问：https://rancher.demo.cn/，然后设置 heml 安装时候设置的引导密码和初始密码，即可登录。
 
@@ -254,7 +254,7 @@ root@demo-2:~# docker run -d --restart=unless-stopped \
 
 目前为止，我们已经安装了高可用的 Rancher，但因为是通过 hosts 文件去做的映射，所以有很多用户会遇到下游集群无法添加的情况，本文继续演示添加下游集群。
 
-### 创建集群
+#### 创建集群
 
 创建一个 rke 集群，选择所有角色，然后将生成的命令复制到 demo-3 主机，这样会自动 将 demo-3 作为下游集群的节点添加集群到 rancher。
 ![](https://raw.githubusercontent.com/kingsd041/picture/main/202302222129247.png)
