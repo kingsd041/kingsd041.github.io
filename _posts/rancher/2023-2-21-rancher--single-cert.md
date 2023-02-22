@@ -2,13 +2,13 @@
 layout: post
 title: Rancher 高可用安装-自签名证书+4层 LB
 subtitle: 使用自签名证书+L4 LB 安装高可用安装
-date: 2022-12-1 21:07:00 +0800
+date: 2023-2-22 21:07:00 +0800
 author: Ksd
 header-img: img/post-bg-desk.jpg
 catalog: true
 tags:
   - Rancher
-  - S3gw
+  - 高可用
 ---
 
 ## 前言
