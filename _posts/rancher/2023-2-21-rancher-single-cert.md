@@ -22,6 +22,10 @@ tags:
 
 ## 说明
 
+#### 参考
+
+本文示例步骤，均参考 Rancher 官网文档[在 Kubernetes 集群上安装/升级 Rancher](https://ranchermanager.docs.rancher.com/zh/pages-for-subheaders/install-upgrade-on-a-kubernetes-cluster)章节。
+
 #### 关于证书
 
 对于才接触 Rancher 的用户，很多都是卡在了证书的配置上。其实 Rancher 的证书配置非常简单，一共分为以下三种：
@@ -55,9 +59,9 @@ Rancher：v2.7.1
 主机信息：
 | 主机名 | 角色 | IP | OS |
 | ------ | ------------- | -------------- | ------------------ |
-| demo-1 | local cluster | 192.168.205.30 | Ubuntu 18.04.6 LTS |
-| demo-2 | LB(nginx) | 192.168.205.31 | Ubuntu 18.04.6 LTS |
-| demo-2 | 下游集群 | 192.168.205.34 | Ubuntu 18.04.6 LTS |
+| demo-1 | local cluster | 192.168.205.30 | Ubuntu 20.04 LTS |
+| demo-2 | LB(nginx) | 192.168.205.31 | Ubuntu 20.04 LTS |
+| demo-2 | 下游集群 | 192.168.205.34 | Ubuntu 20.04 LTS |
 
 > 本文只是为了演示高可用安装，所以 local 集群只使用了一台，如果是生产环境，建议使用 3 台。
 
@@ -111,15 +115,16 @@ NAME	NAMESPACE	REVISION	UPDATED	STATUS	CHART	APP VERSION
 
 #### 创建自签名证书
 
-生成证书脚本可参考 rancher 2.5 生成自签名证书的[文档](https://docs.rancher.cn/docs/rancher2/installation/resources/advanced/self-signed-ssl/_index/#4-%E5%A6%82%E4%BD%95%E7%94%9F%E6%88%90%E8%87%AA%E7%AD%BE%E5%90%8D%E8%AF%81%E4%B9%A6)
+可通过镜像快速生成自签名证书：
 
 ```
-root@demo-1:~/cert# ./create_self-signed-cert.sh --ssl-domain=rancher.demo.cn
-......
-......
-root@demo-1:~/cert# ls
-cacerts.pem  cacerts.srl  cakey.pem  create_self-signed-cert.sh  openssl.cnf  rancher.demo.cn.crt  rancher.demo.cn.csr  rancher.demo.cn.key  tls.crt  tls.key
+root@demo-1:~# docker run --rm -v /root/cert:/opt/certs kingsd/generate-cert:v0.1 --ssl-domain=rancher.demo.cn
+root@demo-1:~# ls cert/
+cacerts.pem  cacerts.srl  cakey.pem  openssl.cnf  rancher.demo.cn.crt  rancher.demo.cn.csr  rancher.demo.cn.key  tls.crt  tls.key
 ```
+
+> 默认情况下，CA 和 客户端证书有效期均为 10 年，可使用 `--ssl-date` 参数设置有效期，或使用 `docker run --rm -v /root/cert:/opt/certs kingsd/generate-cert:v0.1` 查看更多支持的参数。
+> 脚本实现细节可参考：https://gist.github.com/kingsd041/924249d56a21f690b880f63200737e7c
 
 #### 添加 Helm Chart 仓库
 
@@ -128,20 +133,14 @@ root@demo-1:~# helm repo add rancher-stable https://releases.rancher.com/server-
 "rancher-stable" has been added to your repositories
 ```
 
-#### 为 Rancher 创建命名空间
-
-```
-root@demo-1:~# kubectl create namespace cattle-system
-namespace/cattle-system created
-```
-
 #### 使用自签名证书部署 Rancher
 
 ```
 root@demo-1:~# helm install rancher rancher-stable/rancher \
+  --create-namespace \
   --namespace cattle-system \
   --set hostname=rancher.demo.cn \
-  --set bootstrapPassword=admin \
+  --set bootstrapPassword=RancherForFun \
   --set replicas=1 \
   --set ingress.tls.source=secret \
   --set privateCA=true
@@ -234,7 +233,7 @@ stream {
 root@demo-2:~# docker run -d --restart=unless-stopped \
   -p 80:80 -p 443:443 \
   -v /etc/nginx.conf:/etc/nginx/nginx.conf \
-  nginx:1.14
+  nginx:stable
 ```
 
 #### 修改域名和 LB 的映射记录
@@ -290,42 +289,36 @@ INFO: Using resolv.conf: nameserver 10.43.0.10 search cattle-system.svc.cluster.
 ERROR: https://rancher.demo.cn/ping is not accessible (Could not resolve host: rancher.demo.cn)
 ```
 
-大家可能会有疑问，我们已经在 hosts 文件中映射了域名和 IP，那为什么还解析不了呢？这是因为 cluster-agent 是通过coredns 来解析域名的，因为本次 demo 并没有 DNS 服务器，只在 hosts 中进行了映射，所以 coredns 无法解析域名 rancher.demo.cn。
+大家可能会有疑问，我们已经在 hosts 文件中映射了域名和 IP，那为什么还解析不了呢？这是因为 cluster-agent 是通过 coredns 来解析域名的，因为本次 demo 并没有 DNS 服务器，只在 hosts 中进行了映射，所以 coredns 无法解析域名 rancher.demo.cn。
 
-解决这个问题的方法有很多，下面介绍一种比较简单的方式，直接在 cluster-agent deployment 中添加 HostAliases。
+为了解决这个问题，可以通过在 coredns 中添加 [hosts plugin](https://coredns.io/plugins/hosts/) 解决：
 
-在下游集群 controlplan 节点中执行以下命令来获取 kubeconfig 文件：
+因为下游集群还没有变为 `active`，所以无法从 Rancher UI 去下载 kubeconfig 文件，但可以在下游集群 controlplan 节点中执行以下命令来获取 kubeconfig 文件：
+
 ```
 docker run --rm --net=host -v $(docker inspect kubelet --format '{{ range .Mounts }}{{ if eq .Destination "/etc/kubernetes" }}{{ .Source }}{{ end }}{{ end }}')/ssl:/etc/kubernetes/ssl:ro --entrypoint bash $(docker inspect $(docker images -q --filter=label=io.cattle.agent=true) --format='{{index .RepoTags 0}}' | tail -1) -c 'kubectl --kubeconfig /etc/kubernetes/ssl/kubecfg-kube-node.yaml get configmap -n kube-system full-cluster-state -o json | jq -r .data.\"full-cluster-state\" | jq -r .currentState.certificatesBundle.\"kube-admin\".config | sed -e "/^[[:space:]]*server:/ s_:.*_: \"https://127.0.0.1:6443\"_"' > kubeconfig_admin.yaml
 ```
 
-> 如果下游集群是 K3S 或 RKE2，直接到 /etc/rancher/k3s/k3s.yaml 或  /etc/rancher/rke2/rke2.yaml 获取 kubeconfig 文件即可。
+> 如果下游集群是 K3S 或 RKE2，直接到 /etc/rancher/k3s/k3s.yaml 或 /etc/rancher/rke2/rke2.yaml 获取 kubeconfig 文件即可。
 
-添加映射：
+修改 coredns 配置：
+
 ```
-root@demo-3:~# kubectl -n cattle-system patch  deployments cattle-cluster-agent --patch '{
-    "spec": {
-        "template": {
-            "spec": {
-                "hostAliases": [
-                    {
-                      "hostnames":
-                      [
-                        "rancher.demo.cn"
-                      ],
-                      "ip": "192.168.205.31"
-                    }
-                ]
-            }
+root@demo-3:~# kubectl -n kube-system edit configmap coredns
+......
+        hosts {
+            192.168.205.31   rancher.demo.cn
+            fallthrough
         }
-    }
-}'
-
+......
 ```
+
+![](https://raw.githubusercontent.com/kingsd041/picture/main/202302231107226.png)
 
 执行后，cluster-agent 成功运行，集群状态立刻变为 `active`。
 
 另外，解决以上问题的其他方法可参考：
+
 - https://docs.rancher.cn/docs/rancher2.5/faq/install/_index/#error-httpsranchermyorgping-is-not-accessible-could-not-resolve-host-ranchermyorg
 - https://forums.rancher.cn/t/k8s-cluster-register-cattle-cluster-agent-could-not-resolve-host/1672
 
