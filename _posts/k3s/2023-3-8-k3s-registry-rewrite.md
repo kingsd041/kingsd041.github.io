@@ -39,3 +39,8 @@ Image is up to date for sha256:b119c4dfc78c8227a776d5b786e781ff9e20b214d0a90efee
 root@k3s-demo:/etc/rancher/k3s# crictl images
 ghcr.io/test/kubectl                         v1.20.2                b119c4dfc78c8       12MB
 ```
+
+##  其他
+
+[使用 Harbor 作为 K3S 的镜像代理缓存后端](https://www.cnblogs.com/roy2220/p/14811537.html) ，这个场景可以作为参考。
+
