@@ -64,7 +64,7 @@ root@k3s1:~# kubectl exec -it nginx-deployment-7588dc757d-krt5k bash
 root@nginx-deployment-7588dc757d-krt5k:/# ping test.kingsd.top
 PING test.kingsd.top (127.0.0.1) 56(84) bytes of data.
 64 bytes from localhost (127.0.0.1): icmp_seq=1 ttl=64 time=0.033 ms
-^C
+
 --- test.kingsd.top ping statistics ---
 1 packets transmitted, 1 received, 0% packet loss, time 0ms
 rtt min/avg/max/mdev = 0.033/0.033/0.033/0.000 ms
