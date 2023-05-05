@@ -15,7 +15,7 @@ tags:
 
 Kubernetes 需要大量 CA 证书才能正常运行。有关 Kubernetes 如何使用 CA 证书，请参阅 Kubernetes [PKI 证书和要求](https://kubernetes.io/docs/setup/best-practices/certificates/#all-certificates)文档。
 
-默认情况下，K3s 在第一个 Server 节点启动时生成自签名 CA 证书。这些 CA 证书自颁发日起 10 年内有效，不会自动更新。
+默认情况下，K3s 在第一个 Server 节点启动时生成自签名 CA 证书。这些 CA 证书自颁发日起 10 年内有效，不会自动更新。社区中有许多用户担心 10 年后 CA 证书过期，集群会出现问题。那么本文将介绍如何去轮换 CA 的证书。
 
 要轮换 CA 证书和密钥，可使用 `k3s certificate rotate-ca` 命令。 该命令会执行完整性检查，从而确认更新的证书和密钥可用。 如果更新后的数据没有问题，则会更新数据存储的加密引导程序密钥，并在下次 K3s 启动时使用新的证书和密钥。 如果在验证证书和密钥时出现了问题，则会向系统日志报告错误，并取消操作且不做任何更改。
 
