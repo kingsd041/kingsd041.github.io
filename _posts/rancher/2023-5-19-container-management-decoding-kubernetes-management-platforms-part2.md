@@ -2,7 +2,7 @@
 layout: post
 title: 解读 Kubernetes 管理平台（第二部分）
 subtitle:
-date: 2023-5-4 11:07:00 +0800
+date: 2023-5-19 11:08:00 +0800
 author: Ksd
 header-img: img/post-bg-desk.jpg
 catalog: true
