@@ -2,7 +2,7 @@
 layout: post
 title: RKE2/K3S 镜像仓库的对应关系
 subtitle: 
-date: 2023-3-23 11:06:00 +0800
+date: 2023-6-23 11:06:00 +0800
 author: Ksd
 header-img: img/post-bg-desk.jpg
 catalog: true
