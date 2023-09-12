@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Rancher Roundup 2023-6
+title: Rancher Roundup 2023-7
 subtitle:
 date: 2023-7-10 11:07:00 +0800
 author: Ksd
