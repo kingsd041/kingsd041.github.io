@@ -816,7 +816,7 @@ function Sizzle( selector, context, results, seed ) {
 				groups = tokenize( selector );
 
 				if ( (old = context.getAttribute("id")) ) {
-					nid = old.replace( rescape, "\\$&" );
+					nid = old.replace( rescape, "\$&" );
 				} else {
 					context.setAttribute( "id", nid );
 				}
