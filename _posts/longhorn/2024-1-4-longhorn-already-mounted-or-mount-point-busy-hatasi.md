@@ -2,14 +2,12 @@
 layout: post
 title: Longhorn “already mounted or mount point busy”
 subtitle:
-date: 2023-12-7 11:07:00 +0800
+date: 2024-1-4 11:07:00 +0800
 author: Ksd
 header-img: img/post-bg-debug.jpg
 catalog: true
 tags:
-  - RKE2
-  - 迁移
-  - 恢复
+  - Longhorn
 ---
 
 我在 Kubernetes 上使用 Longhorn。Longhorn 为我的数据在 3 个工作节点上提供了一个共享池。数据在各个 Pod 之间同步，不管工作节点如何。在我的当前设置中，Longhorn 安装在外部磁盘上，这就是问题的根本原因。有时，当在 Pods 中使用多个设备或路径时，可能会遇到以下错误：
