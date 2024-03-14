@@ -25,9 +25,9 @@ Nov 14 13:53:13 rke2-1 sh[8590]: + /usr/bin/systemctl is-enabled --quiet nm-clou
 Nov 14 13:53:13 rke2-1 sh[8591]: Failed to get unit file state for nm-cloud-setup.service: No such file or directory
 ```
 
-尝试检查 nm-cloud-setup.service 服务是否启用，但未找到该服务的单元文件。参考：https://docs.rke2.io/known_issues#networkmanager
+尝试检查 nm-cloud-setup.service 服务是否禁用。参考：https://docs.rke2.io/known_issues#networkmanager
 
-2. RKE2 初始化：
+1. RKE2 初始化：
 
 ```
 Nov 14 13:53:14 rke2-1 rke2[8599]: time="2023-11-14T13:53:14+08:00" level=warning msg="not running in CIS mode"
