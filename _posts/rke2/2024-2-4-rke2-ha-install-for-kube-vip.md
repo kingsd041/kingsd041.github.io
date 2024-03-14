@@ -1,6 +1,6 @@
 ---
 layout: post
-title: RKE2 使用 Nginx/HAProxy 进行高可用部署
+title: RKE2 使用 Kube-VIP 进行高可用部署
 subtitle:
 date: 2024-2-4 11:07:00 +0800
 author: Ksd
