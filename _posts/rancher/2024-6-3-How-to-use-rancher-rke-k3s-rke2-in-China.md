@@ -1,6 +1,6 @@
 ---
 layout: post
-title: 畅行无阻: K3S、RKE2、RKE 到 Rancher 的国内资源部署技巧
+title: K3S、RKE2、RKE 到 Rancher 的国内资源部署技巧
 subtitle: 利用国内资源安装 Rancher/K3S/RKE2/RKE
 date: 2024-6-3 11:07:00 +0800
 author: Ksd

@@ -106,6 +106,12 @@ IP: \4{eth0} # or IP: \4
 systemctl mask apt-daily.service apt-daily-upgrade.service
 ```
 
+5. 关闭 ufw
+
+```
+systemctl stop ufw && systemctl disable ufw
+```
+
 6. 清理 cloud-init
 
 ```
