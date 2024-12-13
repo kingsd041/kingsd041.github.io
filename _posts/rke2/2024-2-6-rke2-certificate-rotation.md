@@ -180,7 +180,7 @@ root@ha-m1:~# systemctl restart rke2-server.service
 
 3. 重启所有 rke2 agent 服务
 
-登录到 所有 rke2 agent 节点，重启 rke2 agent 服务：
+登录到**所有**rke2 agent 节点，重启 rke2 agent 服务：
 
 ```
 root@ha-w1:~# systemctl restart rke2-agent.service
@@ -365,7 +365,7 @@ root@ha-m3:~# rm -rf /var/lib/rancher/rke2/server/tls/dynamic-cert.json
 root@ha-m3:~# systemctl restart rke2-server.service
 ```
 
-1. 重启所有 rke2 agent 服务
+1. 重启**所有** rke2 agent 服务
 
 登录到 所有 rke2 agent 节点，重启 rke2 agent 服务：
 
