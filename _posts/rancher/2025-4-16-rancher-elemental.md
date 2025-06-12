@@ -215,6 +215,4 @@ Inventory of Machines 页面可以通过点击右侧三个点的菜单来自定�
 📚 **推荐阅读：**
 
 - 🌐 官方主页：https://elemental.docs.rancher.com/
-- 🚀 快速入门（UI）：https://elemental.docs.rancher.com/quickstart-ui
-- 🧰 CLI 部署指南：https://elemental.docs.rancher.com/quickstart-cli
 - 📦 GitHub 项目地址：https://github.com/rancher/elemental

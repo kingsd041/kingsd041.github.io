@@ -7,7 +7,7 @@ author: Ksd
 header-img: img/post-bg-desk.jpg
 catalog: true
 tags:
-  - K3s
+  - K3k
 ---
 
 ## 国内使用
