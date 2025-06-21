@@ -1,7 +1,7 @@
 ---
 layout: post
-title: 边缘设备自动上线 + 集群自建，这才是 Kubernetes 的终极玩法！
-subtitle: 一站式搞定边缘与裸金属节点的 Kubernetes 自动化部署与集中管理
+title: Rancher 移除 Kubernetes 组件
+subtitle: 本文介绍如何断开 Rancher 创建的 Kubernetes 集群中的一个节点，并删除该节点中的所有 Kubernetes 组件。此过程允许你将节点用于其他用途。
 date: 2025-6-21 11:06:00 +0800
 author: Ksd
 header-img: img/post-bg-desk.jpg
