@@ -61,8 +61,7 @@ $ sudo shutdown -r now
 
 将注册集群分离 Rancher 后，集群的工作负载将不受影响，你可以使用与集群注册到 Rancher 之前相同的方法来访问集群。
 
-<Tabs>
-<TabItem value="使用 UI/API">
+#### 使用 UI/API
 
 > 此过程将删除你的集群数据。在执行命令之前，由于数据将会丢失，请确保你已经备份了要保留的文件。
 
@@ -76,8 +75,8 @@ $ sudo shutdown -r now
 
 **结果**：已删除[移除了什么](#移除了什么)章节中为注册集群列出的所有组件。
 
-</TabItem>
-<TabItem value="使用脚本">
+
+#### 使用脚本
 
 你可以运行脚本，而不是使用 Rancher UI 来清理已注册的集群节点。
 
@@ -107,13 +106,10 @@ $ sudo shutdown -r now
 
 **结果**：脚本已运行。已删除[移除了什么](#移除了什么)章节中为注册集群列出的所有组件。
 
-</TabItem>
-</Tabs>
 
 ## 清理节点
 
-<Tabs>
-<TabItem value="RKE1">
+#### RKE1
 
 在运行以下命令之前，首先通过 Rancher UI 删除节点。
 
@@ -167,8 +163,7 @@ Kubernetes 组件和 secret 会留下以下挂载：
 for mount in $(mount | grep tmpfs | grep '/var/lib/kubelet' | awk '{ print $3 }') /var/lib/kubelet /var/lib/rancher; do umount $mount; done
 ```
 
-</TabItem>
-<TabItem value="RKE2">
+#### RKE2
 
 你需要从 Rancher 提供的 RKE2 节点中删除以下组件：
 
@@ -191,8 +186,7 @@ curl https://raw.githubusercontent.com/rancher/system-agent/main/system-agent-un
 sudo rke2-uninstall.sh
 ```
 
-</TabItem>
-<TabItem value="K3s">
+#### K3s
 
 你需要从 Rancher 提供的 K3s 节点中删除以下组件：
 
@@ -215,17 +209,13 @@ curl https://raw.githubusercontent.com/rancher/system-agent/main/system-agent-un
 sudo k3s-uninstall.sh
 ```
 
-</TabItem>
-</Tabs>
-
 ### 目录和文件
 
 以下目录在将节点添加到集群时使用，应将该目录删除。你可以使用 `rm -rf /directory_name` 来删除目录。
 
 > 节点分配的角色决定了出现在节点上的目录。
 
-<Tabs>
-<TabItem value="RKE1">
+#### RKE1
 
 | 目录                         |
 | ---------------------------- |
@@ -271,8 +261,7 @@ rm -rf /etc/ceph \
        /var/run/calico
 ```
 
-</TabItem>
-<TabItem value="RKE2">
+#### RKE2
 
 | 目录                         |
 | ---------------------------- |
@@ -316,8 +305,7 @@ rm -rf /etc/ceph \
        /var/run/calico
 ```
 
-</TabItem>
-<TabItem value="K3s">
+#### K3s
 
 | 目录                         |
 | ---------------------------- |
@@ -365,8 +353,6 @@ rm -rf /etc/ceph \
        /var/run/calico
 ```
 
-</TabItem>
-</Tabs>
 
 ### 网络接口和 iptables
 
