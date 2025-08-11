@@ -2,7 +2,7 @@
 layout: post
 title: 从手动到自动：用 Rancher Cluster API 改造你的扩缩容流程
 subtitle: 使用 Rancher Cluster API 轻松实现自动扩展
-date: 2025-6-21 11:06:00 +0800
+date: 2025-8-7 11:06:00 +0800
 author: Ksd
 header-img: img/post-bg-desk.jpg
 catalog: true
