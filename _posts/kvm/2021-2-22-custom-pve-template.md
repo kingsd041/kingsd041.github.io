@@ -1,6 +1,6 @@
 ---
 layout: post
-title: PVE 制作ubuntu 1804 模板
+title: PVE 制作ubuntu 24.04 模板
 subtitle:
 date: 2021-2-22 21:06:00 +0800
 author: Ksd
@@ -13,25 +13,25 @@ tags:
 
 ## 前言
 
-初学 pve，搭建方式非常简单，但创建 vm 时默认使用 iso，这样使用起来比较麻烦，还是喜欢使用 OpenStack 那种直接使用镜像去创建 vm 的感觉。 研究了下，在 pve 中可以通过模板去创建 vm，个人理解和 vmware 是类似，所以总结了创建 ubuntu 1804 模板的过程
+初学 pve，搭建方式非常简单，但创建 vm 时默认使用 iso，这样使用起来比较麻烦，还是喜欢使用 OpenStack 那种直接使用镜像去创建 vm 的感觉。 研究了下，在 pve 中可以通过模板去创建 vm，个人理解和 vmware 是类似，所以总结了创建 ubuntu 24.04 模板的过程
 
 ## 制作模板
 
 #### 下载 ubuntu 模板到 pve 主机上
 
-下载地址：https://releases.ubuntu.com/18.04/
+下载地址：https://cloud-images.ubuntu.com/noble/current/
 
 #### 创建 vm，导入镜像
 
 ```
 #!/bin/bash
 
-VM_NAME=ubuntu-bionic-server-template
-VM_ID=9006
+VM_NAME=noble-24.04-template
+VM_ID=9008
 VM_CORES=2
-VM_MEM=4096
-VM_IMAGE=bionic-server-cloudimg-amd64.img
-VM_DISK=40G
+VM_MEM=8192
+VM_IMAGE=noble-server-cloudimg-amd64.img
+VM_DISK=200G
 
 qm create $VM_ID --cores $VM_CORES --memory $VM_MEM --name $VM_NAME --net0 virtio,bridge=vmbr0
 
@@ -53,7 +53,11 @@ qm set $VM_ID --boot c --bootdisk scsi0
 
 #### 设置 cloud-init
 
-![](https://tva1.sinaimg.cn/large/008eGmZEly1gnwf4ux214j31lm0lu0u2.jpg)
+![](https://raw.githubusercontent.com/kingsd041/picture/main/202509022211904.png)
+
+#### 启用 QEMU Guest Agent
+
+![](https://raw.githubusercontent.com/kingsd041/picture/main/202509022226536.png)
 
 #### 开机，修改虚拟机相关配置
 
@@ -66,33 +70,37 @@ timedatectl set-timezone Asia/Shanghai
 2. 修改 apt 源为阿里源
 
 ```
-cat /etc/apt/sources.list
-deb http://mirrors.aliyun.com/ubuntu/ bionic main restricted universe multiverse
-deb http://mirrors.aliyun.com/ubuntu/ bionic-security main restricted universe multiverse
-deb http://mirrors.aliyun.com/ubuntu/ bionic-updates main restricted universe multiverse
-deb http://mirrors.aliyun.com/ubuntu/ bionic-proposed main restricted universe multiverse
-deb http://mirrors.aliyun.com/ubuntu/ bionic-backports main restricted universe multiverse
-deb-src http://mirrors.aliyun.com/ubuntu/ bionic main restricted universe multiverse
-deb-src http://mirrors.aliyun.com/ubuntu/ bionic-security main restricted universe multiverse
-deb-src http://mirrors.aliyun.com/ubuntu/ bionic-updates main restricted universe multiverse
-deb-src http://mirrors.aliyun.com/ubuntu/ bionic-proposed main restricted universe multiverse
-deb-src http://mirrors.aliyun.com/ubuntu/ bionic-backports main restricted universe multiverse
+cat /etc/apt/sources.list.d/ubuntu.sources
+# 阿里云
+Types: deb
+URIs: http://mirrors.aliyun.com/ubuntu/
+Suites: noble noble-updates noble-security
+Components: main restricted universe multiverse
+Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
+
 ```
 
-3. 注释掉 apt 的配置，否则会继续沿用默认的 apt 配置
+3. 安装 qemu-guest-agent
+```
+apt update
+apt install qemu-guest-agent
+systemctl start qemu-guest-agent
+systemctl enable qemu-guest-agent
+```
+
+4. 注释掉 apt 的配置，否则会继续沿用默认的 apt 配置
 
 ```
 vi /etc/cloud/cloud.cfg
-# - apt-configure
+# - apt_configure
 ```
 
-4. 清除 hostname
+5. 清除 hostname
 
 ```
 truncate -s0 /etc/hostname
 ```
-
-4. 修改/etc/issue,将 IP 显示在 console
+6. 修改/etc/issue,将 IP 显示在 console
 
 ```
 vi /etc/issue
@@ -100,26 +108,26 @@ IP: \4{eth0} # or IP: \4
 
 ```
 
-5. 停用 apt 自动更新
+7. 停用 apt 自动更新
 
 ```
 systemctl mask apt-daily.service apt-daily-upgrade.service
 ```
 
-5. 关闭 ufw
+8. 关闭 ufw
 
 ```
 systemctl stop ufw && systemctl disable ufw
 ```
 
-6. 清理 cloud-init
+9. 清理 cloud-init
 
 ```
 cloud-init clean && rm -rf /var/lib/cloud/*
 ```
 
-7. 清空 `/etc/machine-id`
-   18.04 默认使用/etc/machine-id 作为 dhcp identifier，如果不清空，使用相同模板创建的 vm，对应的 IP 是相同的。
+10. 清空 `/etc/machine-id`
+ubuntu 默认使用/etc/machine-id 作为 dhcp identifier，如果不清空，使用相同模板创建的 vm，对应的 IP 是相同的。
 
 ```
 echo -n > /etc/machine-id
@@ -127,7 +135,7 @@ echo -n > /etc/machine-id
 
 > 参考：https://superuser.com/questions/1338510/wrong-ip-address-from-dhcp-client-on-ubuntu-18-04
 
-8. 清理残留 log，清理 bash history
+11. 清理残留 log，清理 bash history
 
 ```
 apt clean
@@ -135,7 +143,7 @@ cat /dev/null > ~/.bash_history && history -c
 history -w
 ```
 
-9. 关机
+12. 关机
 
 ```
 shutdown -h now
@@ -144,7 +152,7 @@ shutdown -h now
 #### 生成模板
 
 ```
-qm template 9006
+qm template 9008
 ```
 
 接下来就可以利用模板 通过克隆出 vm 了
