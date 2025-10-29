@@ -12,4 +12,6 @@ tags:
   - VMware
 ---
 
-转载：https://never666.uk/2028/
+参考：https://never666.uk/2028/
+
+vcenter 参考：https://www.osyunwei.com/archives/15703.html
