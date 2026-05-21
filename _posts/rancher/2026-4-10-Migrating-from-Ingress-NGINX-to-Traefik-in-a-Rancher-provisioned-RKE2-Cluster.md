@@ -109,15 +109,15 @@ done
 
 - Traefik 与 Ingress NGINX 同时运行
 - Traefik 默认使用 8000 和 8443 端口进行部署，而 Ingress NGINX 使用 80 和 443 端口（或你选择的任何端口）。
-- 创建新的 IngressClass：`traefix`
-- Traefik 部署时启用了 kubernetesIngressNginx provider，并使用了 `traefix`。此 IngressClass 资源会自动部署。
+- 创建新的 IngressClass：`traefik`
+- Traefik 部署时启用了 kubernetesIngressNginx provider，并使用了 `traefik`。此 IngressClass 资源会自动部署。
 
 ### 3. 功能验证
 
 - 现有 Ingress NGINX：验证现有 Ingress 是否仍然可以通过标准端口 (80/443) 上的 Ingress NGINX 访问。
 - 新的 Traefik Ingress（测试）：部署新的 Ingress 资源，指定 traefik class 来测试 Traefik，使用临时端口（8000/8443）进行访问。
 - 验证 Traefik DaemonSet manifest：默认情况下，DaemonSet 包含 hostPort: 8000 和 hostPort: 8443。如果你修改了这些端口，那就根据实际情况验证。
-- 新增 IngressClass：新增一个名为 `traefix` 的 IngressClass。
+- 新增 IngressClass：新增一个名为 `traefik` 的 IngressClass。
 - Traefik 的 IngressNginx provider：验证 IngressNginx provider 是否已启动。在 Traefik 日志中会显示：
 
 ```
@@ -132,7 +132,7 @@ INF Starting provider *ingressnginx.Provider
 
 为每个关键 Ingress 创建副本，仅修改：
 
-对于每个关键的 Ingress 资源（当前使用 ingressClassName: nginx），创建一个清单副本，只做一项更改：将类名设置为 `traefix`。
+对于每个关键的 Ingress 资源（当前使用 ingressClassName: nginx），创建一个清单副本，只做一项更改：将类名设置为 `traefik`。
 
 在 Rancher UI 中执行如下步骤：
 
@@ -142,7 +142,7 @@ INF Starting provider *ingressnginx.Provider
 4. 每个 ingress 资源都执行：
    1. 点击 **Clone**
    2. 输入一个新的名称，例如在原名称后添加后缀 `-traefik`
-   3. 点击 **Ingress Class** 选项卡，然后在 **Ingress Class** 下拉菜单中选择 `traefix`。
+   3. 点击 **Ingress Class** 选项卡，然后在 **Ingress Class** 下拉菜单中选择 `traefik`。
    4. 点击 **Create**
 
 ### 2. 双路径测试
