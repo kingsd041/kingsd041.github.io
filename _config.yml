@@ -5,7 +5,7 @@ header-img: img/post-bg-unix-linux.jpg
 email: nicholas_ksd@hotmail.com
 description: "Every failure is leading towards success."
 keyword: "Ksd, Ksd Blog, Ksd的博客, hailong, 王海龙, Docker, Linux"
-url: "https://kingsd041.github.io"          # your host, for absolute URL
+url: "https://kingsd.top"          # your host, for absolute URL
 baseurl: ""      # for example, '/blog' if your blog hosted on 'host/blog'
 github_repo: "https://github.com/kingsd041/kingsd041.github.io.git" # you code repository
 
