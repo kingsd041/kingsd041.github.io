@@ -82,3 +82,51 @@
 .highlight .vi { color: teal; }
 .highlight .il { color: #009999; }
 .highlight .gc { color: #999; background-color: #EAF2F5; }
+
+
+/*
+ * macOS 窗口风格代码块（左上角红/黄/绿三个圆点，类 GitHub）
+ * 兼容两种 Rouge 输出结构：.highlighter-rouge（默认）与 figure.highlight
+ */
+.highlighter-rouge,
+figure.highlight {
+    position: relative;
+    margin: 1.6em 0;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.10);
+    overflow: hidden;
+}
+
+/* 顶部标题栏 */
+.highlighter-rouge::before,
+figure.highlight::before {
+    content: "";
+    display: block;
+    height: 34px;
+    background: linear-gradient(to bottom, #ededed, #e0e0e0);
+    border-bottom: 1px solid #d0d0d0;
+}
+
+/* 三个圆点：红 / 黄 / 绿（用 box-shadow 复制，单个伪元素搞定） */
+.highlighter-rouge::after,
+figure.highlight::after {
+    content: "";
+    position: absolute;
+    top: 11px;
+    left: 13px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #fc625d;
+    box-shadow: 20px 0 0 #fdbc40, 40px 0 0 #35cd4b;
+}
+
+/* 让 <pre> 融入窗口：去掉原有的边框与圆角 */
+.highlighter-rouge .highlight pre,
+figure.highlight pre {
+    border: none !important;
+    border-radius: 0 !important;
+    margin: 0;
+    padding: 14px 16px;
+    background-color: #f8f8f8;
+}
