@@ -106,6 +106,24 @@ layout: default
                     id: md5(location.pathname),
                     });
                     gitalk.render('gitalk-container');
+
+                    // 禁用 Grammarly 等浏览器扩展对 Gitalk 输入框的注入，
+                    // 避免 React 受控输入被破坏导致"只能输入一个字符"的问题
+                    var disableExt = function(el){
+                        el.setAttribute('data-gramm', 'false');
+                        el.setAttribute('data-gramm_editor', 'false');
+                        el.setAttribute('data-enable-grammarly', 'false');
+                        el.setAttribute('spellcheck', 'false');
+                        el.setAttribute('autocomplete', 'off');
+                    };
+                    var gtContainer = document.getElementById('gitalk-container');
+                    if(gtContainer && 'MutationObserver' in window){
+                        disableExt(gtContainer);
+                        new MutationObserver(function(mutations){
+                            gtContainer.querySelectorAll('input, textarea').forEach(disableExt);
+                        }).observe(gtContainer, {childList:true, subtree:true});
+                        gtContainer.querySelectorAll('input, textarea').forEach(disableExt);
+                    }
                 </script>
                 {% endif %}
                 <!-- Gitalk end -->
