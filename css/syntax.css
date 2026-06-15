@@ -86,9 +86,10 @@
 
 /*
  * macOS 窗口风格代码块（左上角红/黄/绿三个圆点，类 GitHub）
- * 兼容两种 Rouge 输出结构：.highlighter-rouge（默认）与 figure.highlight
+ * 注意：必须限定为 div.highlighter-rouge，否则会误伤行内代码
+ * <code class="language-plaintext highlighter-rouge">（kramdown 给行内 code 也加了同名 class）
  */
-.highlighter-rouge,
+div.highlighter-rouge,
 figure.highlight {
     position: relative;
     margin: 1.6em 0;
@@ -98,7 +99,7 @@ figure.highlight {
 }
 
 /* 顶部标题栏 */
-.highlighter-rouge::before,
+div.highlighter-rouge::before,
 figure.highlight::before {
     content: "";
     display: block;
@@ -108,7 +109,7 @@ figure.highlight::before {
 }
 
 /* 三个圆点：红 / 黄 / 绿（用 box-shadow 复制，单个伪元素搞定） */
-.highlighter-rouge::after,
+div.highlighter-rouge::after,
 figure.highlight::after {
     content: "";
     position: absolute;
@@ -122,7 +123,7 @@ figure.highlight::after {
 }
 
 /* 让 <pre> 融入窗口：去掉原有的边框与圆角 */
-.highlighter-rouge .highlight pre,
+div.highlighter-rouge .highlight pre,
 figure.highlight pre {
     border: none !important;
     border-radius: 0 !important;
