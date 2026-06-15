@@ -177,6 +177,13 @@
 <!--fastClick.js (已移除，现代浏览器不再需要，且会导致 Gitalk 输入框异常) -->
 
 
+<!-- 站内搜索 (lunr.js + 中文分词，仅在搜索页加载) -->
+{% if page.search %}
+<script src="{{ "/js/lunr.min.js" | prepend: site.baseurl }}"></script>
+<script src="{{ "/js/search.js" | prepend: site.baseurl }}"></script>
+{% endif %}
+
+
 <!-- Google Analytics -->
 {% if site.ga_track_id %}
 <script>

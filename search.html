@@ -1,0 +1,121 @@
+---
+title: 搜索
+layout: default
+description: 输入关键词，搜索全站文章
+search: true
+header-img: "img/post-bg-unix-linux.jpg"
+---
+
+<!-- Page Header -->
+<header class="intro-header" style="background-image: url('{{ site.baseurl }}/{% if page.header-img %}{{ page.header-img }}{% else %}{{ site.header-img }}{% endif %}')">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="site-heading">
+                    <h1>{{ page.title }}</h1>
+                    <span class="subheading">{{ page.description }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Search meta: base url for fetch -->
+<meta name="search-base" content="{{ site.baseurl }}">
+
+<!-- Search Box + Results -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+
+            <div class="search-box">
+                <i class="fa fa-search search-box-icon"></i>
+                <input id="search-input" type="text" placeholder="搜索文章，如：k3s、容器、airgap …" autocomplete="off" spellcheck="false">
+            </div>
+
+            <p id="search-status" class="search-status">输入关键词搜索 175+ 篇文章</p>
+
+            <div id="search-results" class="search-results"></div>
+
+        </div>
+    </div>
+</div>
+
+<style>
+.search-box {
+    position: relative;
+    margin: 40px 0 24px;
+}
+.search-box-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #bbb;
+    font-size: 18px;
+}
+#search-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 14px 18px 14px 46px;
+    font-size: 16px;
+    border: 2px solid #e7e7e7;
+    border-radius: 30px;
+    outline: none;
+    transition: border-color .2s;
+    font-family: inherit;
+}
+#search-input:focus {
+    border-color: #0085a1;
+}
+.search-status {
+    color: #999;
+    font-size: 14px;
+    text-align: center;
+}
+.search-results {
+    margin-top: 16px;
+}
+.search-result {
+    padding: 22px 0;
+    border-bottom: 1px solid #eee;
+}
+.search-result-title {
+    display: block;
+    font-size: 22px;
+    font-weight: 600;
+    color: #404040;
+    line-height: 1.4;
+}
+.search-result-title:hover {
+    color: #0085a1;
+}
+.search-result-sub {
+    margin-top: 4px;
+    font-size: 15px;
+    color: #a3a3a3;
+}
+.search-result-snippet {
+    margin-top: 8px;
+    font-size: 14px;
+    line-height: 1.7;
+    color: #999;
+}
+.search-result-meta {
+    margin-top: 8px;
+    font-size: 13px;
+    color: #bbb;
+}
+.search-result-date {
+    margin-right: 12px;
+}
+.search-tag {
+    display: inline-block;
+    margin-right: 6px;
+    padding: 2px 8px;
+    background: #f5f5f5;
+    border-radius: 3px;
+    color: #999;
+    font-size: 12px;
+}
+</style>
