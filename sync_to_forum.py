@@ -9,12 +9,39 @@ API_KEY = os.getenv("RANCHER_FORUM_API_KEY")
 USERNAME = os.getenv("RANCHER_FORUM_USER")
 CATEGORY_ID = os.getenv("RANCHER_FORUM_CATEGORY")
 
+# 明确允许同步的 7 个产品子目录名
+ALLOWED_CATEGORIES = {
+    "harvester", 
+    "k3s", 
+    "longhorn", 
+    "neuvector", 
+    "rancher", 
+    "rancherdesktop", 
+    "rke2"
+}
+
+def is_allowed_file(file_path):
+    """检查文件是否属于允许同步的 7 个目录之一"""
+    # 将路径标准化为正斜杠，防止 Windows 兼容性问题
+    normalized_path = file_path.replace("\\", "/")
+    parts = normalized_path.split("/")
+    
+    # 判断路径结构是否为 _posts/<category>/...
+    if "posts" in parts or "_posts" in parts:
+        try:
+            # 找到 _posts 所在的下标，下一级就是分类目录名
+            posts_idx = parts.index("_posts") if "_posts" in parts else parts.index("posts")
+            category_dir = parts[posts_idx + 1]
+            return category_dir in ALLOWED_CATEGORIES
+        except IndexError:
+            return False
+    return False
+
 def parse_markdown(file_path):
     """解析 Markdown 的 Front Matter 与正文"""
     with open(file_path, "r", encoding="utf-8") as f:
         content = f.read()
 
-    # 匹配 YAML Front Matter
     front_matter_match = re.match(r"^---\s*\n(.*?)\n---\s*\n(.*)$", content, re.DOTALL)
     if front_matter_match:
         yaml_content = front_matter_match.group(1)
@@ -25,10 +52,8 @@ def parse_markdown(file_path):
         title = None
         body = content
 
-    # 若未在 Front Matter 配置 title，提取文件名作为标题
     if not title:
         base_name = os.path.basename(file_path).replace(".md", "")
-        # 过滤 Jekyll 常见的 2026-08-06- 前缀
         title = re.sub(r"^\d{4}-\d{2}-\d{2}-", "", base_name).replace("-", " ").capitalize()
 
     return title, body.strip()
@@ -64,13 +89,19 @@ def publish_topic(title, body, file_path):
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("用法: python sync_to_forum.py ")
+        print("用法: python sync_to_forum.py <path_to_markdown_file>")
         sys.exit(1)
 
     target_file = sys.argv[1]
+    
     if not os.path.exists(target_file):
         print(f"文件不存在: {target_file}")
         sys.exit(1)
+
+    # 路径拦截判断
+    if not is_allowed_file(target_file):
+        print(f"⚠️ 忽略跳过: 文件 [{target_file}] 不属于指定的 7 个同步目录之一。")
+        sys.exit(0)
 
     post_title, post_body = parse_markdown(target_file)
     publish_topic(post_title, post_body, target_file)
