@@ -1,0 +1,53 @@
+name: Auto Sync Posts to Rancher Forum
+
+on:
+  push:
+    paths:
+      - '_posts/**/*.md'  # 👈 修改这里：支持匹配 _posts 及其任意子目录下的 md 文件
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install Python Dependencies
+        run: pip install requests pyyaml
+
+      - name: Get Added Markdown Files
+        id: changed-files
+        run: |
+          # 👈 修改这里：grep 条件改为匹配 _posts/ 任意子目录下的 .md 文件
+          FILES=$(git diff --name-only --diff-filter=A HEAD~1 HEAD | grep '^_posts/.*\.md$' || true)
+          
+          echo "files<<EOF" >> $GITHUB_OUTPUT
+          echo "$FILES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Sync Posts to Rancher Forum
+        env:
+          RANCHER_FORUM_API_KEY: ${{ secrets.RANCHER_FORUM_API_KEY }}
+          RANCHER_FORUM_USER: ${{ secrets.RANCHER_FORUM_USER }}
+          RANCHER_FORUM_CATEGORY: ${{ secrets.RANCHER_FORUM_CATEGORY }}
+        run: |
+          FILES="${{ steps.changed-files.outputs.files }}"
+          if [ -z "$FILES" ]; then
+            echo "本次提交中未包含新增的 Markdown 文章，跳过同步。"
+          else
+            echo "检测到新增文章:"
+            echo "$FILES"
+            for file in $FILES; do
+              if [ -f "$file" ]; then
+                echo "正在发布: $file"
+                python sync_to_forum.py "$file"
+              fi
+            done
+          fi
