@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Rancher v2.15 监控实战：基于 RKE2 的 kube-prometheus-stack 与 PushProx 配置
+title: Rancher v2.15 新监控模式实践：使用 kube-prometheus-stack 与 Monitoring Dashboards 监控 RKE2 集群
 subtitle: 以 RKE2 为例，构建 kube-prometheus-stack 与 Rancher Monitoring Dashboards 的监控方案
 
 date: 2026-9-17 11:06:00 +0800
